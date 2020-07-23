@@ -4,33 +4,31 @@ import numpy as np
 ########## ABC Helper Functions ##########
 
 ### Get bins summary statistic ###
-def GetBins(allele_freqs):
-
+def GetBins(allele_freqs, num_bins):
+    
+    bins = [0] * num_bins
+   
     middle_index = int(len(allele_freqs)/2)
     
-    # Calculate frequency of allele with value 0
-    freqs_0 = allele_freqs[middle_index] 
+    boundary_low = middle_index - int((num_bins - 1)/2)
+    bins[0] = sum(allele_freqs[0:boundary_low + 1])
     
-    freqs_low = 0
-    freqs_high = 0
+    boundary_high = middle_index + int((num_bins - 1)/2)
+    bins[num_bins - 1] = sum(allele_freqs[boundary_high:len(allele_freqs)])
     
-    # Calculate frequency of alleles with value less than 0
-    for i in range(0, middle_index):
-        freqs_low = freqs_low + allele_freqs[i]
-        
-    # Calculate frequency of alleles with value greater than 0
-    for i in range(middle_index+1, len(allele_freqs)):
-        freqs_high = freqs_high + allele_freqs[i]
-    
-    bins = [float(freqs_low), float(freqs_0), float(freqs_high)]
+    bins_index = 1
+    for i in range(boundary_low + 1, boundary_high):
+        bins[bins_index] = allele_freqs[i]
+        bins_index = bins_index + 1
+                           
     return bins
 
 ### Get summary statistics ###
-def GetSummStats(freq_string):
+def GetSummStats(freq_string, num_bins):
     allele_freqs = [float(freq) for freq in freq_string.split(',')]
     obs_het = 1-sum([item**2 for item in allele_freqs])
     obs_common = len([i for i in allele_freqs if i >= 0.05]) 
-    obs_bins = GetBins(allele_freqs)
+    obs_bins = GetBins(allele_freqs, num_bins)
     return obs_het, obs_common, obs_bins
 
 ### Get average allele ###
@@ -120,7 +118,7 @@ def GetVectorDistance(vector1, vector2):
     return distance
 
 ### Get list of s with corresponding allele frequencies for ABC ###
-def GetABCList(abcFile):
+def GetABCList(abcFile, num_bins):
     abc_file = open(abcFile, 'r')
     header = abc_file.readline().strip().split('\t')
     
@@ -140,9 +138,9 @@ def GetABCList(abcFile):
         
         abc_het = 1-sum([item**2 for item in allele_freqs])
         abc_common = len([i for i in allele_freqs if i >= 0.05]) 
-        abc_bins_narrow = GetBins(allele_freqs)
+        abc_bins = GetBins(allele_freqs, num_bins)
         
-        stats_list = [s, abc_het, abc_common, abc_bins_narrow]
+        stats_list = [s, abc_het, abc_common, abc_bins]
         abc_list.append(stats_list)
         
     abc_file.close()
@@ -153,7 +151,6 @@ def Get_S_ABC(abc_list, obs_het, obs_common, obs_bins, constant_het,
               use_common, use_bins):
     s_accepted = []
     EPSILON_het = GetEpsilonHet(obs_het, constant_het, denom_het)
-    
     EPSILON_common = GetEpsilonCommon(obs_common, constant_common, denom_common)
     EPSILON_bins = eps_bins
   
@@ -163,19 +160,15 @@ def Get_S_ABC(abc_list, obs_het, obs_common, obs_bins, constant_het,
     
     if use_het == 'y':
         stats_to_check.append(0)
-       
     if use_common == 'y':
         stats_to_check.append(1)
     if use_bins == 'y':
         stats_to_check.append(2)
     
- 
-        
     for combo in abc_list:
         stats = [False, False, False]
         if abs(obs_het - combo[1]) < EPSILON_het: 
             stats[0] = True
-            #s_accepted.append(pair[0])
         
         if abs(obs_common - combo[2]) < EPSILON_common: 
             stats[1] = True
