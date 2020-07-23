@@ -1,5 +1,0 @@
-Total lines: 100
-Total accepted lines: 97 0.97
-Lower bound for s is zero: 96 0.96
-s_acc median: 95.44
-s_acc mean: 57.85484536082474
