@@ -1,0 +1,19 @@
+# Timing 
+10 sims, 200 loci -> 2 min
+
+nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py column mot per opt_thresh model eps_mean eps_var eps_med num_sims outFolder perform_validation k_val theta_val num_bins &
+
+### VALIDATION ###
+# TEST
+nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 6 0.0 3 8 euro_p2 1 1 1 3 test 0 0.187 0.0356 3 &
+
+# COMMANDS
+nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 6 0.0 3 8 euro_p2 4 2 3 600 files 0 0.187 0.0356 3 &
+
+nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 6 0.0 3 8 euro_p2 4 2 3 600 files 0 0.14 0.00472 3 &
+
+nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 6 0.0 3 8 euro_p2 4 2 3 600 files 0 0.0881 0.2541 3 &
+
+nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 6 0.0 3 8 euro_p2 4 2 3 600 files 0 0.036 0.0032 3 &
+
+nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 6 0.0 3 8 euro_p2 4 2 3 600 files 0 0.13 0.5 &
