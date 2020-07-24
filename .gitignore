@@ -1,1 +1,12 @@
 __pycache__
+annotations/
+old/
+*_old/
+backup/
+organized/
+parents/
+simulation/
+ssc_files/
+supp_figures/
+tscc_dir/
+.ipynb_checkpoints/
