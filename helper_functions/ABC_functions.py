@@ -92,7 +92,7 @@ def Process_Freqs(freqs, per, end, start):
     max_allele = abs(max(allele_list, key=abs))
     
     # Get allele freqs
-    allele_freqs = np.zeros(2*max_allele+1)
+    allele_freqs = [0] * (2*max_allele+1) #np.zeros(2*max_allele+1)
     for key in freqs_dic_final:
         allele_freq = freqs_dic_final[key]/pop_size
         allele_freqs[max_allele+key] = allele_freq

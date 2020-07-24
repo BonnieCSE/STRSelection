@@ -72,7 +72,16 @@ def main():
         gene = info[12]
 
         opt_allele, allele_freqs = Process_Freqs(freqs, per, end, start)
+        
+        #for i in range(0, num_zeros_to_add):
+            #allele_freqs.append(0)
+            #allele_freqs.insert(0, 0)
         freq_string = ','.join(str(round(item, 5)) for item in allele_freqs)
+        if len(allele_freqs) < num_bins:
+            num_zeros_to_add = int((num_bins - len(allele_freqs))/2)
+            for i in range(0, num_zeros_to_add):
+                freq_string = '0.0,' + freq_string
+                freq_string = freq_string + ',0.0'
         obs_het, obs_common, obs_bins = GetSummStats(freq_string, num_bins)
         results.write(chrom + '\t' + str(start) + '\t' + str(end) + '\t' + str(per) + '\t' + str(opt_allele) + '\t' + motif + \
                       '\t' + coding + '\t'  + intron + '\t' + UTR5 + '\t' + UTR3 + '\t' + promoter5kb + '\t' + intergenic + \

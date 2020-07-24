@@ -3,6 +3,8 @@ nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py con
 TEST 
 nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.005 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/trinuc_100.txt y y y 3 euro_p1 &
 
+nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.005 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/trinuc_100.txt y y y 7 euro_p1 &
+
 COMMANDS
 nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.005 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/allele_freqs_filt.txt y n y 3 euro_p1 &
 
@@ -11,3 +13,16 @@ nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.0
 nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.005 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/allele_freqs_filt.txt y n n 3 euro_p1 &
 
 nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.005 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/allele_freqs_filt.txt y n n 3 euro_p2 &
+
+nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.005 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/trinuc.txt y n n 3 euro_p3 &
+
+nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.0006 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/allele_freqs_filt.txt y n y 3 euro_p1 &
+
+nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.0006 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/allele_freqs_filt.txt y n y 3 euro_p2 &
+
+nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.0006 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/allele_freqs_filt.txt y n n 3 euro_p1 &
+
+nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.0006 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/allele_freqs_filt.txt y n n 3 euro_p2 &
+
+nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.0006 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/trinuc.txt y n n 3 euro_p3 &
+
