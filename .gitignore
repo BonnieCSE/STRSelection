@@ -9,3 +9,4 @@ simulation/
 ssc_files/
 tscc_dir/
 .ipynb_checkpoints/
+*~

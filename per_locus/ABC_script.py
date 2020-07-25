@@ -1,3 +1,5 @@
+# Script to run per-locus ABC method to get posterior distirbution of s for each STR
+
 ### Imports ###
 
 import matplotlib
@@ -25,6 +27,8 @@ def main():
     use_bins = sys.argv[9]
     num_bins = int(sys.argv[10])
     model = sys.argv[11]
+    
+    # Name output files
     file_type = ''
     if inFile == '/storage/BonnieH/selection_project/ssc_files/allele_freqs/trinuc_100.txt':
         file_type = '_test'
@@ -34,10 +38,12 @@ def main():
         file_type = '_all_per'
     filename = str(constant_het) + "_" + str(denom_het) + "_" + str(eps_bins) + \
                "_" + use_het + use_common + use_bins + str(num_bins) + "_" + model + file_type
+    
     outFile = '/storage/BonnieH/selection_project/per_locus/results/' + filename + '.txt'
     figFile = '/storage/BonnieH/selection_project/per_locus/results/figs/' + filename + '.png'
     statsFile = '/storage/BonnieH/selection_project/per_locus/results/stats/' + filename + '.txt'
     
+    # Open output files
     allele_freqs_file = open(inFile, 'r')
     stats_file = open(statsFile, 'w')
     results = open(outFile, "w")
@@ -48,11 +54,12 @@ def main():
                   "\t" + "het" + "\t" + "common" + "\t" + "bins" + "\t" + "ABC_s_median" + "\t" + "ABC_s_95%_CI" + "\t" + \
                   "Num_s_accepted" + "\n")
 
-    total_lines_acc = 0
-    total_lines = 0
-    lower_0 = 0
-    s_acc = []
-    
+    total_lines_acc = 0 # Total lines with >10 s accepted
+    total_lines = 0 
+    lower_0 = 0 # Total lines where lower bound is 0
+    s_acc = [] # List of percent of s accepted
+     
+    # Perform ABC on each locus
     for line in allele_freqs_file:
         # Get information from line
         total_lines = total_lines + 1
@@ -71,29 +78,32 @@ def main():
         intergenic = info[11]
         gene = info[12]
 
+        # Get optimal allele and allele_freqs
         opt_allele, allele_freqs = Process_Freqs(freqs, per, end, start)
         
-        #for i in range(0, num_zeros_to_add):
-            #allele_freqs.append(0)
-            #allele_freqs.insert(0, 0)
         freq_string = ','.join(str(round(item, 5)) for item in allele_freqs)
+        
+        # Add 0s to allele frequency list if number of alleles less than number of bins
         if len(allele_freqs) < num_bins:
             num_zeros_to_add = int((num_bins - len(allele_freqs))/2)
             for i in range(0, num_zeros_to_add):
                 freq_string = '0.0,' + freq_string
                 freq_string = freq_string + ',0.0'
+                
+        # Get summary stats
         obs_het, obs_common, obs_bins = GetSummStats(freq_string, num_bins)
+        
         results.write(chrom + '\t' + str(start) + '\t' + str(end) + '\t' + str(per) + '\t' + str(opt_allele) + '\t' + motif + \
                       '\t' + coding + '\t'  + intron + '\t' + UTR5 + '\t' + UTR3 + '\t' + promoter5kb + '\t' + intergenic + \
                       '\t' + gene + '\t' + str(round(obs_het, 7)) + '\t' + str(obs_common) + '\t' + \
                       ','.join(str(round(item,4)) for item in obs_bins) + '\t')
         
-        if per ==3 and opt_allele > 12: 
+        if per == 3 and opt_allele > 12: # All optimal alleles > 12 have the same mutation rate as optimal allele 12
             opt_allele = 12
-        if per ==3 and opt_allele < 5:
+        if per == 3 and opt_allele < 5:
             opt_allele = 5
             
-        if per ==4 and opt_allele > 10:
+        if per == 4 and opt_allele > 10:
             opt_allele = 10
         if per == 4 and opt_allele < 7:
             opt_allele = 7
@@ -113,6 +123,8 @@ def main():
                                        obs_het, obs_common, obs_bins, constant_het, 
                                        denom_het, constant_common, denom_common, eps_bins, use_het, 
                                        use_common, use_bins)
+        
+        # Round s values < 10^-5 to 0
         if s_ABC != -1:
             if s_ABC < 10**-5:
                 s_ABC = 0
@@ -148,6 +160,7 @@ def main():
             
     results.close()
     
+    # Output statistics
     stats_file.write("Total lines: " + str(total_lines) + "\n")
     percent_acc = total_lines_acc/total_lines
     stats_file.write("Total accepted lines: " + str(total_lines_acc) + " " + str(percent_acc) + "\n")
@@ -167,7 +180,6 @@ def main():
     buckets = list(np.arange(0, 101, 1)) 
     
     plt.hist(s_acc, bins=buckets, weights=np.ones(len(s_acc)) / len(s_acc))
-    #print(s_acc)
 
     plt.title('Percent s accepted during ABC %s model \n const_het %.5f, denom_het = %d, num_bins = %d \n Summ stats used: het = %s common alleles = %s bins = %s'%(model, constant_het, denom_het, num_bins, use_het, use_common, use_bins))
     plt.xlabel("% s accepted")

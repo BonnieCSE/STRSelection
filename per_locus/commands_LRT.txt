@@ -1,0 +1,7 @@
+nohup time python /storage/BonnieH/selection_project/per_locus/LRT_script.py constant_het denom_het constant_common denom_common eps_bins inFile use_het use_common use_bins num_bins model LRT_num_sims
+
+TEST 
+nohup time python /storage/BonnieH/selection_project/per_locus/LRT_script.py 0.005 3 1 4 0.3 /storage/BonnieH/selection_project/per_locus/results/0.005_3_0.3_yyy3_euro_p1_test.txt y y y 3 euro_p1 200 &
+
+COMMANDS
+nohup time python /storage/BonnieH/selection_project/per_locus/LRT_script.py 0.0006 3 1 4 0.3 /storage/BonnieH/selection_project/per_locus/results/0.0006_3_0.3_yny3_euro_p1_all_per.txt y n y 3 euro_p1 200 &
