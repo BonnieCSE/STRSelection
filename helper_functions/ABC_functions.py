@@ -6,17 +6,18 @@ import numpy as np
 ### Get bins summary statistic ###
 def GetBins(allele_freqs, num_bins):
     
-    bins = [0] * num_bins
+    bins = [0] * num_bins # List of binned allele frequencies
    
     middle_index = int(len(allele_freqs)/2)
     
-    boundary_low = middle_index - int((num_bins - 1)/2)
+    boundary_low = middle_index - int((num_bins - 1)/2) # Everything below boundary_low is combined together into a bin
     bins[0] = sum(allele_freqs[0:boundary_low + 1])
     
-    boundary_high = middle_index + int((num_bins - 1)/2)
+    boundary_high = middle_index + int((num_bins - 1)/2) # Everything above boundary_jogj is combined together into a bin
     bins[num_bins - 1] = sum(allele_freqs[boundary_high:len(allele_freqs)])
     
     bins_index = 1
+    # Fill in rest of the bins between lower and upper boundary
     for i in range(boundary_low + 1, boundary_high):
         bins[bins_index] = allele_freqs[i]
         bins_index = bins_index + 1
@@ -117,12 +118,12 @@ def GetVectorDistance(vector1, vector2):
         distance = distance + abs(vector1[i] - vector2[i])
     return distance
 
-### Get list of s with corresponding allele frequencies for ABC ###
+### Get list of s with corresponding summary statistics ###
 def GetABCList(abcFile, num_bins):
     abc_file = open(abcFile, 'r')
     header = abc_file.readline().strip().split('\t')
     
-    # Get freqs column number in file
+    # Get column number of freqs column in file
     freqs_column = 0
     for i in range(0, len(header)):
         if header[i] == 'freqs':
@@ -146,17 +147,17 @@ def GetABCList(abcFile, num_bins):
     abc_file.close()
     return abc_list
         
+# Get posterior estimate of s using ABC
 def Get_S_ABC(abc_list, obs_het, obs_common, obs_bins, constant_het, 
               denom_het, constant_common, denom_common, eps_bins, use_het, 
               use_common, use_bins):
+    
     s_accepted = []
     EPSILON_het = GetEpsilonHet(obs_het, constant_het, denom_het)
     EPSILON_common = GetEpsilonCommon(obs_common, constant_common, denom_common)
     EPSILON_bins = eps_bins
   
-    
     stats_to_check = []
-    
     
     if use_het == 'y':
         stats_to_check.append(0)
