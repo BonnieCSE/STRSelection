@@ -3,6 +3,35 @@ from scipy.stats.distributions import chi2
 
 ########## LRT Helper Functions ##########
 
+def GetAllLRTLists(file_prefix, suffix_list, s):
+    
+    list_of_lists = []
+    for suffix in suffix_list:
+        
+        lrt_file = open(file_prefix + '_'+suffix + '.txt', 'r')
+    
+        header = lrt_file.readline().strip()
+    
+        for line in lrt_file:
+            info = line.strip().split('\t')
+            s_val = float(info[0])
+            summ_stats = info[1]
+            
+            if suffix == 'bins' or suffix == 'bins_narrow':
+                summ_stats= [s for s in summ_stats.split(';')]
+            elif suffix == 'common':
+                summ_stats= [int(s) for s in summ_stats.split(';')]
+            else:
+                summ_stats= [float(s) for s in summ_stats.split(';')]
+            
+            if s_val == s:
+                list_of_lists.append(summ_stats)
+                break
+        
+        lrt_file.close()
+    
+    return list_of_lists
+
 # Out of all s values in list, get s value closest to given s
 def getNearestS(s_ABC_round, s_list_available):
     min_dist = 100000000
