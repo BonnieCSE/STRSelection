@@ -1,8 +1,13 @@
+# Script to run ABC for all-locus/joint method 
+
+### Imports ###
+
 import sys
 sys.path.append("/storage/BonnieH/selection_project/helper_functions")
 from Joint_method_functions import *
 PLOTDIR = '/storage/BonnieH/selection_project/joint_method/results/'
 
+# Main function
 def main():
     inFile = '/storage/BonnieH/selection_project/ssc_files/allele_freqs/allele_freqs_filt.txt'
     allele_freqs_file = open(inFile, 'r')
@@ -27,14 +32,19 @@ def main():
     k_val = float(sys.argv[12])
     theta_val = float(sys.argv[13])
     num_bins = int(sys.argv[14])
+    
+    # Naming file
     filename = PLOTDIR + 'no_validation/'
     if perform_validation == True:
         filename = PLOTDIR + 'validation/' 
         
     filename = filename + outFolder + '/'
-    solution_file = open(filename + 'per' + str(period) + '_' + str(column) + '_' + mot + '_thresh_' + str(opt_thresh) + '_k_' + str(k_val) + '_theta_' + str(theta_val) + '_sims_' + str(num_sims) + '_' + str(eps_mean) + str(eps_var) + str(eps_med) + '.txt', 'w')
+    solution_file = open(filename + 'per' + str(period) + '_' + str(column) + '_' + mot + '_thresh_' + \
+                         str(opt_thresh) + '_k_' + str(k_val) + '_theta_' + str(theta_val) + '_sims_' + \
+                         str(num_sims) + '_' + str(eps_mean) + str(eps_var) + str(eps_med) + '.txt', 'w')
     
     solution_file.write("Num sims: " + str(num_sims) + '\n')
+    
     motif_dic = {} # Dictionary of motifs; Key motif; Value number of motifs
     
     # Get all motifs
@@ -62,6 +72,7 @@ def main():
     header = allele_freqs_file.readline().strip()
     
     obs_het_distr = []
+    obs_common_distr = []
     opt_allele_list = []
     count = 0
    
@@ -91,16 +102,23 @@ def main():
                 count = count + 1
                 if count%divisor==0: 
                     obs_het_distr.append(obs_het)
+                    obs_common_distr.append(obs_common)
                     opt_allele_list.append((per, opt_allele))
     
-    obs_vec = getVector(obs_het_distr)
-    obs_mean = np.mean(obs_het_distr)
-    obs_var = np.var(obs_het_distr)
-    obs_med = np.median(obs_het_distr)
+    obs_mean_het = np.mean(obs_het_distr)
+    obs_var_het = np.var(obs_het_distr)
+    obs_med_het = np.median(obs_het_distr)
+    obs_het_stats = [obs_mean_het, obs_var_het, obs_med_het]
     
+    obs_mean_common = np.mean(obs_common_distr)
+    obs_var_common = np.var(obs_common_distr)
+    obs_med_common = np.median(obs_common_distr)
+    obs_common_stats = [obs_mean_common, obs_var_common, obs_med_common]
+    eps_het = 
+    eps_common = 
     if perform_validation == True:
-        toAdd, het_list = EstimateParam(opt_allele_list, k_val, theta_val, obs_mean, obs_var, obs_vec, obs_med, \
-                                        model, eps_mean, eps_var, eps_med) 
+        toAdd, het_list, common_list = EstimateParam(opt_allele_list, k_val, theta_val, obs_het_stats, obs_common_stats, \
+                                        model, eps_het, eps_common) 
         
         # TODO: Add use_common parameter
 
