@@ -1,3 +1,6 @@
+'''This file contains helper functions for ABC
+'''
+
 import math
 import numpy as np
 
@@ -17,6 +20,7 @@ def GetBins(allele_freqs, num_bins):
     bins[num_bins - 1] = sum(allele_freqs[boundary_high:len(allele_freqs)])
     
     bins_index = 1
+    
     # Fill in rest of the bins between lower and upper boundary
     for i in range(boundary_low + 1, boundary_high):
         bins[bins_index] = allele_freqs[i]

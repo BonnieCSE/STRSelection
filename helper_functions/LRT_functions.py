@@ -1,3 +1,6 @@
+'''This file contain helper functions for LRT
+'''
+
 from ABC_functions import *
 from scipy.stats.distributions import chi2
 
