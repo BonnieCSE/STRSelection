@@ -1,6 +1,7 @@
 import random
-from ABC_functions import *
-
+from LRT_functions import *
+import time
+import statistics
 ########## Joint Method Helper Functions ##########
 
 def GetL1Norm(allele_freqs_prev, allele_freqs):
@@ -25,34 +26,54 @@ def getVector(het_distr):
     return vec
 
 def get_bin_size(s):
-    if s <= 0.000001:
-        return 0.000001
-    return s/10
+    #if s <= 10**-6: 
+        #return 10**-6
+    if s <= 0.0001:
+        return 0.00001
+    if s <= 0.001:
+        return 0.0001
+    if s <= 0.01:
+        return 0.001
+    if s <= 0.2:
+        return 0.01
+    return 0.1
+    #return s/10
 
-def GetHet(table, s, bin_size): 
+def GetHetandCommon(table, s, bin_size): 
     het_list = []
+    common_list = []
     for combo in table:
         s_val = combo[0]
-        het = combo[1]
-            
         if abs(s-s_val) < bin_size:
+            het = combo[1]
+            common = combo[2]
             het_list.append(het)
+            common_list.append(common)
                
     num_accepted = len(het_list)
     index = random.randrange(0, num_accepted, 1)
-    return het_list[index]
+    return het_list[index], common_list[index]
+
+def GetHetCommon(table):
+    total = len(table)
+    index = random.randrange(0, total, 1)
+    return table[index][0], table[index][1]
    
-# Get distribution of heterozygosity simulated
+# Get distribution of simulated heterozygosity and common allele
 # Look up optimal allele, period, s
-def EstimateParam(opt_allele_list, shape, scale, obs_mean, obs_var, obs_vec, obs_med, model, eps_mean, eps_var, eps_med):
+def EstimateParam(ABC_tables, opt_allele_list, shape, scale, obs_het_stats, \
+                  obs_common_stats, model, eps_het, eps_common, use_common_alleles, return_lists=False):
     het_list = []
+    common_list = []
+    time1 = 0
+    time2 = 0
     for combo in opt_allele_list:
         
         s = np.random.gamma(shape, scale)
         if s > 1:
             s = 1
 
-        # Perform simulation and get het; add to sim het distribution
+        # Perform simulation and get het and common allele; add summary statistics to distribution
         # Get from lookup table
         per = combo[0]
         optimal_ru = combo[1]
@@ -68,26 +89,49 @@ def EstimateParam(opt_allele_list, shape, scale, obs_mean, obs_var, obs_vec, obs
             optimal_ru = 11
         if per == 2 and optimal_ru > 20:
             optimal_ru = 20
-        bin_size = get_bin_size(s)
+            
+        #bin_size = get_bin_size(s)
         
-        file = '/gymreklab-tscc/bonnieh/abc/results/'+model+'/' + str(per) + '_' + str(optimal_ru) + '.txt' 
+        #file = '/gymreklab-tscc/bonnieh/abc/results/'+model+'/' + str(per) + '_' + str(optimal_ru) + '.txt' 
         
-        num_bins = 3
-       
-        table = GetABCList(file, num_bins)
+        num_bins = 0
         
-        het = GetHet(table, s, bin_size) 
-        
+        first = time.time()
+        #table = ABC_tables[optimal_ru] #GetABCList(file, num_bins)
+        dic_summ_stats = ABC_tables[optimal_ru] #GetABCList(file, num_bins)
+        second = time.time()
+        t1 = second-first
+        time1 = time1 + t1
+        third = time.time()
+        #het, common = GetHetandCommon(table, s, bin_size) 
+        s_round = get_LRT_bin(s)
+        table = dic_summ_stats[s_round]
+        pair = random.choice(table)
+        het, common = pair[0], pair[1]#GetHetCommon(table)
+        fourth = time.time()
+        t2 = fourth-third
+        time2 = time2 + t2
         het_list.append(het)
-        
-    sim_mean = np.mean(het_list)
-    sim_var = np.var(het_list)
-    sim_vec = getVector(het_list)
-    sim_med = np.median(het_list)
-    array_obs = np.array(obs_vec)
-    array_sim = np.array(sim_vec)
+        common_list.append(common)
     
-    if abs(obs_mean - sim_mean) < obs_mean/eps_mean and abs(obs_var - sim_var) < obs_var/eps_var and abs(obs_med - sim_med) < obs_med/eps_med:
-        return True, het_list
+    if return_lists == True:
+        return het_list, common_list
+        
     else:
-        return False, het_list
+        sim_mean_het = np.mean(het_list)
+        sim_var_het = np.var(het_list)
+        sim_med_het = np.median(het_list)
+        
+        sim_mean_common = np.mean(common_list)
+        sim_var_common = np.var(common_list)
+        sim_med_common = np.median(common_list)
+        
+        if abs(obs_het_stats[0] - sim_mean_het) < obs_het_stats[0]/eps_het[0] and abs(obs_het_stats[1] - sim_var_het) < obs_het_stats[1]/eps_het[1] and abs(obs_het_stats[2] - sim_med_het) < obs_het_stats[2]/eps_het[2]:
+            if use_common_alleles == False:
+                return True, time1, time2
+            if abs(obs_common_stats[0] - sim_mean_common) < obs_common_stats[0]/eps_common[0] and abs(obs_common_stats[1] - sim_var_common) < obs_common_stats[1]/eps_common[1] and abs(obs_common_stats[2] - sim_med_common) < obs_het_stats[2]/eps_common[2]:
+                return True, time1, time2
+            else:
+                return False, time1, time2
+        else:
+            return False, time1, time2

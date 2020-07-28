@@ -1,19 +1,28 @@
 # Timing 
 10 sims, 200 loci -> 2 min
 
-nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py column mot per opt_thresh model eps_mean eps_var eps_med num_sims outFolder perform_validation k_val theta_val num_bins &
+nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py per column mot opt_thresh model eps_mean_het eps_var_het eps_med_het eps_mean_common eps_var_common eps_med_common num_sims outFolder use_common_alleles perform_validation k_val theta_val &
 
 ### VALIDATION ###
 # TEST
-nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 6 0.0 3 8 euro_p2 1 1 1 3 test 0 0.187 0.0356 3 &
+nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 3 6 0.0 8 euro_p2 0.01 0.01 0.01 0.01 0.01 0.01 1000 test 0 0 0.187 0.0356 &
 
 # COMMANDS
-nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 6 0.0 3 8 euro_p2 4 2 3 600 files 0 0.187 0.0356 3 &
+nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 2 6 0.0 11 euro_p2 4 2 3 4 2 3 1000 test 0 0 0.187 0.0356 &
 
-nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 6 0.0 3 8 euro_p2 4 2 3 600 files 0 0.14 0.00472 3 &
 
-nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 6 0.0 3 8 euro_p2 4 2 3 600 files 0 0.0881 0.2541 3 &
+nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 2 6 0.0 11 euro_p2 8 8 8 8 8 8 10000 test 0 0 0.179 0.000056 &
 
-nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 6 0.0 3 8 euro_p2 4 2 3 600 files 0 0.036 0.0032 3 &
+nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 2 6 0.0 11 euro_p2 8 8 8 8 8 8 10000 test 0 0 0.328 0.00003 &
 
-nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 6 0.0 3 8 euro_p2 4 2 3 600 files 0 0.13 0.5 &
+nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 2 6 0.0 11 euro_p2 8 8 8 8 8 8 10000 test 0 0 0.097 0.001 &
+
+nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 2 6 0.0 11 euro_p2 8 8 8 8 8 8 10000 test 0 0 0.564 0.00018 &
+
+nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 2 6 0.0 11 euro_p2 8 8 8 8 8 8 10000 test 0 0 0.227 0.0044 &
+
+nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 2 6 0.0 11 euro_p2 8 8 8 8 8 8 10000 test 0 0 0.13 0.0077 &
+
+nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 2 6 0.0 11 euro_p2 8 8 8 8 8 8 10000 test 0 0 0.487 0.0205 &
+
+nohup time python /storage/BonnieH/selection_project/joint_method/joint_method.py 2 6 0.0 11 euro_p2 8 8 8 8 8 8 10000 test 0 0 0.192 0.0521 &

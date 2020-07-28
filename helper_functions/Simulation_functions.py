@@ -6,6 +6,7 @@ Functions for mutation model, selection model, and simulation algorithm
 import numpy as np
 from scipy.stats import geom
 import copy
+from ABC_functions import *
 
 ########## Simulation Helper Functions ##########
 
@@ -195,23 +196,27 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, set_star
     t = 0 # Number of iterations of while loop
 
     het_list = []
+    var_list = []
     opt_freq_list = []
     while t < max_iter:
         
         if t % 100 == 0 and t < max_iter - 5920:
             het = 1-sum([item**2 for item in allele_freqs])
             het_list.append(het)
+            var = GetVar(allele_freqs)
+            var_list.append(var)
             middle_index = int(len(allele_freqs)/2)
             opt_freq_list.append(allele_freqs[middle_index])
             
         # Get allele frequencies before incorporating European demographics 
         if t == max_iter - 5920: # if t == 20000
-            allele_counts = np.random.multinomial(end_samp_n, allele_freqs)
+            #allele_counts = np.random.multinomial(end_samp_n, allele_freqs)
 
             # Rescale allele_freqs to sum to 1
-            rowsum = np.sum(allele_counts)
+            #rowsum = np.sum(allele_counts)
 
-            allele_freqs_20k = allele_counts/rowsum
+            #allele_freqs_20k = allele_counts/rowsum
+            allele_freqs_20k = copy.deepcopy(allele_freqs)
             
         # European demographic model
         if t == max_iter - 5920:
@@ -252,12 +257,12 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, set_star
         allele_freqs = np.matmul(transition_matrix_transpose, allele_freqs)
         
         # Use multinomial sampling
-        allele_counts = np.random.multinomial(2*N_e, allele_freqs)
+        #allele_counts = np.random.multinomial(2*N_e, allele_freqs)
             
         # Rescale allele_freqs to sum to 1
-        rowsum = np.sum(allele_counts)
+        #rowsum = np.sum(allele_counts)
 
-        allele_freqs = allele_counts/rowsum
+        #allele_freqs = allele_counts/rowsum
 
         t = t + 1
     
@@ -271,4 +276,4 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, set_star
 
         allele_freqs = allele_counts/rowsum
     
-    return allele_freqs_20k, allele_freqs #, het_list, opt_freq_list
+    return allele_freqs_20k, allele_freqs, het_list, var_list

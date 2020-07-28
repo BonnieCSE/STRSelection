@@ -33,8 +33,11 @@ def GetSummStats(freq_string, num_bins):
     allele_freqs = [float(freq) for freq in freq_string.split(',')]
     obs_het = 1-sum([item**2 for item in allele_freqs])
     obs_common = len([i for i in allele_freqs if i >= 0.05]) 
-    obs_bins = GetBins(allele_freqs, num_bins)
-    return obs_het, obs_common, obs_bins
+    if num_bins == 0:
+        return obs_het, obs_common
+    else:
+        obs_bins = GetBins(allele_freqs, num_bins)
+        return obs_het, obs_common, obs_bins
 
 ### Get average allele ###
 def GetAvg(allele_freqs):
@@ -57,7 +60,7 @@ def GetVar(allele_freqs):
 
 ### Process freqs ###
 # Return optimal allele repeat units, allele frequencies
-def Process_Freqs(freqs, per, end, start):
+def Process_Freqs(freqs, per, end, start, return_freqs=True):
     # Process freqs
     freqs_list = freqs.split(',')
 
@@ -85,24 +88,28 @@ def Process_Freqs(freqs, per, end, start):
     # Get optimal allele repeat unit length and add to abc_combos dictionary
     opt_allele = ref_length_ru + opt_allele_rel
     
-    # Get allele frequencies
-    freqs_dic_final = {}
-    allele_list = []
-    for allele in freqs_dic:
-        new_allele = allele - opt_allele_rel
-        freqs_dic_final[new_allele] = freqs_dic[allele]
-        allele_list.append(new_allele)
+    if return_freqs == False:
+        return opt_allele
     
-    # Get highest absolute value in list
-    max_allele = abs(max(allele_list, key=abs))
-    
-    # Get allele freqs
-    allele_freqs = [0] * (2*max_allele+1) #np.zeros(2*max_allele+1)
-    for key in freqs_dic_final:
-        allele_freq = freqs_dic_final[key]/pop_size
-        allele_freqs[max_allele+key] = allele_freq
-    
-    return opt_allele, allele_freqs
+    else:
+        # Get allele frequencies
+        freqs_dic_final = {}
+        allele_list = []
+        for allele in freqs_dic:
+            new_allele = allele - opt_allele_rel
+            freqs_dic_final[new_allele] = freqs_dic[allele]
+            allele_list.append(new_allele)
+
+        # Get highest absolute value in list
+        max_allele = abs(max(allele_list, key=abs))
+
+        # Get allele freqs
+        allele_freqs = [0] * (2*max_allele+1) #np.zeros(2*max_allele+1)
+        for key in freqs_dic_final:
+            allele_freq = freqs_dic_final[key]/pop_size
+            allele_freqs[max_allele+key] = allele_freq
+
+        return opt_allele, allele_freqs
 
 ### Get epsilon for heterozygosity ###
 def GetEpsilonHet(obs_het, constant_het, denom_het):
@@ -127,26 +134,36 @@ def GetABCList(abcFile, num_bins):
     abc_file = open(abcFile, 'r')
     header = abc_file.readline().strip().split('\t')
     
-    # Get column number of freqs column in file
-    freqs_column = 0
-    for i in range(0, len(header)):
-        if header[i] == 'freqs':
-            freqs_column = i
-    
     abc_list = []
     
-    for line in abc_file:
-        info = line.strip().split('\t')
-        s = float(info[0])
-        freq_string = info[freqs_column]
-        allele_freqs = [float(freq) for freq in freq_string.split(',')]
-        
-        abc_het = 1-sum([item**2 for item in allele_freqs])
-        abc_common = len([i for i in allele_freqs if i >= 0.05]) 
-        abc_bins = GetBins(allele_freqs, num_bins)
-        
-        stats_list = [s, abc_het, abc_common, abc_bins]
-        abc_list.append(stats_list)
+    if num_bins == 0:
+        for line in abc_file:
+            info = line.strip().split('\t')
+            s = float(info[0])
+            het = float(info[1])
+            common = int(info[2])
+            stats_list = [s, het, common]
+            abc_list.append(stats_list)
+     
+    else:
+        # Get column number of freqs column in file
+        freqs_column = 0
+        for i in range(0, len(header)):
+            if header[i] == 'freqs':
+                freqs_column = i
+
+        for line in abc_file:
+            info = line.strip().split('\t')
+            s = float(info[0])
+            freq_string = info[freqs_column]
+            allele_freqs = [float(freq) for freq in freq_string.split(',')]
+
+            abc_het = 1-sum([item**2 for item in allele_freqs])
+            abc_common = len([i for i in allele_freqs if i >= 0.05]) 
+            abc_bins = GetBins(allele_freqs, num_bins)
+
+            stats_list = [s, abc_het, abc_common, abc_bins]
+            abc_list.append(stats_list)
         
     abc_file.close()
     return abc_list
