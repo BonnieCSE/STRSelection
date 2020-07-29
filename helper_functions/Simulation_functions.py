@@ -55,9 +55,9 @@ def GetTransitionMatrix(num_alleles, mu, beta, p, L):
                 transition_matrix[i,j] = mu_prime*prob
         
     # Rescale each row to sum to 1 (which should hopefully be mostly true anyway)
-    #for i in range(num_alleles):
-        #rowsum = np.sum(transition_matrix[i,:])
-        #transition_matrix[i,:] = transition_matrix[i,:]/rowsum
+    for i in range(num_alleles):
+        rowsum = np.sum(transition_matrix[i,:])
+        transition_matrix[i,:] = transition_matrix[i,:]/rowsum
 
     return transition_matrix
 
@@ -200,7 +200,7 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
     opt_freq_list = []
     while t < max_iter:
         
-        if t % 100 == 0 and t < max_iter - 5920:
+        if return_stats == True and t % 100 == 0 and t < max_iter - 5920:
             het = 1-sum([item**2 for item in allele_freqs])
             het_list.append(het)
             var = GetVar(allele_freqs)
@@ -208,15 +208,18 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
             middle_index = int(len(allele_freqs)/2)
             opt_freq_list.append(allele_freqs[middle_index])
             
+        # Get allele frequencies at 20k generations
+        if t == 20000:
+            allele_freqs_20k = copy.deepcopy(allele_freqs)
         # Get allele frequencies before incorporating European demographics 
-        if t == max_iter - 5920: # if t == 20000
+        if t == 50000: # if t == 20000
             #allele_counts = np.random.multinomial(end_samp_n, allele_freqs)
 
             # Rescale allele_freqs to sum to 1
             #rowsum = np.sum(allele_counts)
 
             #allele_freqs_20k = allele_counts/rowsum
-            allele_freqs_20k = copy.deepcopy(allele_freqs)
+            allele_freqs_50k = copy.deepcopy(allele_freqs)
             
         # European demographic model
         if t == max_iter - 5920:
@@ -247,7 +250,7 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
         covariance_matrix = GetCovarianceMatrix(allele_freqs)
 
         # Save previous allele_freqs
-        allele_freqs_prev = copy.deepcopy(allele_freqs)
+        # allele_freqs_prev = copy.deepcopy(allele_freqs)
 
         # Calculate new allele_freqs
         # Applying selection
@@ -258,7 +261,7 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
         
         if use_drift == True:
             # Use multinomial sampling
-            allele_counts = np.random.multinomial(2*N_e, allele_freqs)
+            allele_counts = np.random.multinomial(4*N_e, allele_freqs)
 
             # Rescale allele_freqs to sum to 1
             rowsum = np.sum(allele_counts)
@@ -277,6 +280,6 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
 
         allele_freqs = allele_counts/rowsum
     if return_stats == False:
-        return allele_freqs_20k, allele_freqs
+        return allele_freqs_20k, allele_freqs_50k, allele_freqs
     else:
         return allele_freqs_20k, allele_freqs, het_list, var_list

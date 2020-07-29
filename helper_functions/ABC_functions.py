@@ -16,7 +16,7 @@ def GetBins(allele_freqs, num_bins):
     boundary_low = middle_index - int((num_bins - 1)/2) # Everything below boundary_low is combined together into a bin
     bins[0] = sum(allele_freqs[0:boundary_low + 1])
     
-    boundary_high = middle_index + int((num_bins - 1)/2) # Everything above boundary_jogj is combined together into a bin
+    boundary_high = middle_index + int((num_bins - 1)/2) # Everything above boundary_high is combined together into a bin
     bins[num_bins - 1] = sum(allele_freqs[boundary_high:len(allele_freqs)])
     
     bins_index = 1
