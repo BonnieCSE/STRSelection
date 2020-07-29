@@ -12,8 +12,8 @@ from ABC_functions import *
 
 def GetStepSizeProb(a1, a2, beta, p):
     step_size = (a2-a1)
-    up_prob = max([0,0.5*(1-beta*p*a1)])
-    up_prob = min(up_prob, 1) # Prevent up_prob from being > 1
+    up_prob = max([0.01,0.5*(1-beta*p*a1)]) # Minimum value used to be 0
+    up_prob = min(up_prob, 0.99) # Prevent up_prob from being > 1; Maximum value used to be 1
     down_prob = 1-up_prob
     if step_size>0: dir_prob = up_prob
     else: dir_prob = down_prob
@@ -55,9 +55,9 @@ def GetTransitionMatrix(num_alleles, mu, beta, p, L):
                 transition_matrix[i,j] = mu_prime*prob
         
     # Rescale each row to sum to 1 (which should hopefully be mostly true anyway)
-    for i in range(num_alleles):
-        rowsum = np.sum(transition_matrix[i,:])
-        transition_matrix[i,:] = transition_matrix[i,:]/rowsum
+    #for i in range(num_alleles):
+        #rowsum = np.sum(transition_matrix[i,:])
+        #transition_matrix[i,:] = transition_matrix[i,:]/rowsum
 
     return transition_matrix
 
@@ -168,7 +168,7 @@ Returns
 -------
 
 """
-def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, set_start_equal):
+def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_stats=False, use_drift=True, set_start_equal=False):
 
     PARAM_is_w_additive = True # Whether the fitness matrix of genotypes is additive or multiplicative
 
@@ -256,13 +256,14 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, set_star
         # Applying mutation
         allele_freqs = np.matmul(transition_matrix_transpose, allele_freqs)
         
-        # Use multinomial sampling
-        #allele_counts = np.random.multinomial(2*N_e, allele_freqs)
-            
-        # Rescale allele_freqs to sum to 1
-        #rowsum = np.sum(allele_counts)
+        if use_drift == True:
+            # Use multinomial sampling
+            allele_counts = np.random.multinomial(2*N_e, allele_freqs)
 
-        #allele_freqs = allele_counts/rowsum
+            # Rescale allele_freqs to sum to 1
+            rowsum = np.sum(allele_counts)
+
+            allele_freqs = allele_counts/rowsum
 
         t = t + 1
     
@@ -275,5 +276,7 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, set_star
         rowsum = np.sum(allele_counts)
 
         allele_freqs = allele_counts/rowsum
-    
-    return allele_freqs_20k, allele_freqs, het_list, var_list
+    if return_stats == False:
+        return allele_freqs_20k, allele_freqs
+    else:
+        return allele_freqs_20k, allele_freqs, het_list, var_list
