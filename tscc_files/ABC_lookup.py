@@ -10,18 +10,19 @@ def main():
     ABC_num_sims = int(sys.argv[3])
     k = float(sys.argv[4])
     theta = float(sys.argv[5])
-    outFolder = sys.argv[6]
-    outFile1 = '/projects/ps-gymreklab/bonnieh/abc/results/20k_' + outFolder + '/' + str(per) + '_' + str(opt_allele) + '.txt'
-    outFile2 = '/projects/ps-gymreklab/bonnieh/abc/results/50k_' + outFolder + '/' + str(per) + '_' + str(opt_allele) + '.txt'
-    outFile3 = '/projects/ps-gymreklab/bonnieh/abc/results/eurodem_' + outFolder + '/' + str(per) + '_' + str(opt_allele) + '.txt'
+    filenum = sys.argv[6]
+    outFolder = sys.argv[7]
+    outFile1 = '/projects/ps-gymreklab/bonnieh/abc/results/20k_' + outFolder + '/' + str(per) + '_' + str(opt_allele) + '_' + str(filenum) + '.txt'
+    outFile2 = '/projects/ps-gymreklab/bonnieh/abc/results/50k_' + outFolder + '/' + str(per) + '_' + str(opt_allele) + '_' + str(filenum) + '.txt'
+    outFile3 = '/projects/ps-gymreklab/bonnieh/abc/results/eurodem_' + outFolder + '/' + str(per) + '_' + str(opt_allele) + '_' + str(filenum) + '.txt'
     results1 = open(outFile1, "w")
     results2 = open(outFile2, "w")
-    results3 = open(outFile2, "w")
+    results3 = open(outFile3, "w")
     
     # Write results header
-    results1.write("s" + "\t" + "het" + "\t" + "common" +"\t" + "bins_5" + "\t" + "freqs" + "\n")
-    results2.write("s" + "\t" + "het" + "\t" + "common" +"\t" + "bins_5" + "\t" + "freqs" + "\n")
-    results3.write("s" + "\t" + "het" + "\t" + "common" +"\t" + "bins_5" + "\t" + "freqs" + "\n")
+    results1.write("s" + "\t" + "het" + "\t" + "common" +"\t" + "bins" + "\t" + "freqs" + "\n")
+    results2.write("s" + "\t" + "het" + "\t" + "common" +"\t" + "bins" + "\t" + "freqs" + "\n")
+    results3.write("s" + "\t" + "het" + "\t" + "common" +"\t" + "bins" + "\t" + "freqs" + "\n")
 
     # Period info
     period_info = {}

@@ -20,11 +20,12 @@ def GetAllLRTLists(file_prefix, suffix_list, s):
             s_val = float(info[0])
             summ_stats = info[1]
             
-            if suffix == 'bins' or suffix == 'bins_narrow':
+            if suffix == 'bins': # or suffix == 'bins_narrow':
                 summ_stats= [s for s in summ_stats.split(';')]
             elif suffix == 'common':
                 summ_stats= [int(s) for s in summ_stats.split(';')]
             else:
+                #print(lrt_file)
                 summ_stats= [float(s) for s in summ_stats.split(';')]
             
             if s_val == s:

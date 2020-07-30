@@ -125,7 +125,34 @@ def EstimateParam(ABC_tables, opt_allele_list, shape, scale, obs_het_stats, \
         sim_mean_common = np.mean(common_list)
         sim_var_common = np.var(common_list)
         sim_med_common = np.median(common_list)
+        '''
+        params_accept = [1,1,1,1,1,1]
+        if abs(obs_het_stats[0] - sim_mean_het) < obs_het_stats[0]/eps_het[0]:
+            params_accept[0] = 0
         
+        if abs(obs_het_stats[1] - sim_var_het) < obs_het_stats[1]/eps_het[1]:
+            params_accept[1] = 0
+            
+        if abs(obs_het_stats[2] - sim_med_het) < obs_het_stats[2]/eps_het[2]:
+            params_accept[2] = 0
+            
+        if abs(obs_common_stats[0] - sim_mean_common) < obs_common_stats[0]/eps_common[0]:
+            params_accept[3] = 0
+            
+        if abs(obs_common_stats[1] - sim_var_common) < obs_common_stats[1]/eps_common[1]:
+            params_accept[4] = 0
+            
+        if abs(obs_common_stats[2] - sim_med_common) < obs_het_stats[2]/eps_common[2]:
+            params_accept[5] = 0
+            
+        if use_common_alleles == False:
+            if 1 in params_accept[0:3]:
+                return False, [sim_mean_het, sim_var_het, sim_med_het], params_accept
+            else:
+                return True, [sim_mean_het, sim_var_het, sim_med_het], params_accept
+                
+            
+        '''
         if abs(obs_het_stats[0] - sim_mean_het) < obs_het_stats[0]/eps_het[0] and abs(obs_het_stats[1] - sim_var_het) < obs_het_stats[1]/eps_het[1] and abs(obs_het_stats[2] - sim_med_het) < obs_het_stats[2]/eps_het[2]:
             if use_common_alleles == False:
                 return True, time1, time2
@@ -135,3 +162,4 @@ def EstimateParam(ABC_tables, opt_allele_list, shape, scale, obs_het_stats, \
                 return False, time1, time2
         else:
             return False, time1, time2
+        

@@ -169,8 +169,9 @@ def main():
         num_accepted = len(accepted_params)
         num_accepted_pairs.append(num_accepted)
         middle_index = int(num_accepted/2)
-        median_mean = sort_mean[middle_index][0] * sort_mean[middle_index][1]
-        list_of_medians.append(median_mean)
+        if num_accepted > 0:
+            median_mean = sort_mean[middle_index][0] * sort_mean[middle_index][1]
+            list_of_medians.append(median_mean)
         
     mean_of_medians = np.mean(list_of_medians)
     stdev = np.std(list_of_medians)
