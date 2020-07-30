@@ -105,6 +105,13 @@ def EstimateParam(ABC_tables, opt_allele_list, shape, scale, obs_het_stats, \
         third = time.time()
         #het, common = GetHetandCommon(table, s, bin_size) 
         s_round = get_LRT_bin(s)
+        ## NEW
+        if s_round not in dic_summ_stats:
+            s_list_available = []
+            for elem in dic_summ_stats:
+                s_list_available.append(elem)
+            s_round = getNearestS(s_round, s_list_available)
+        ##
         table = dic_summ_stats[s_round]
         pair = random.choice(table)
         het, common = pair[0], pair[1]#GetHetCommon(table)

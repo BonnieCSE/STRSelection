@@ -1,3 +1,0 @@
-nohup time python /storage/BonnieH/selection_project/joint_method/joint_method_validation_mult.py per model eps_mean_het eps_var_het eps_med_het eps_mean_common eps_var_common eps_med_common num_sims num_trials outFolder use_common_alleles k_val theta_val validation_mean &
-
-nohup time python /storage/BonnieH/selection_project/joint_method/joint_method_validation_mult.py 2 euro_p2 1 1 1 1 1 1 1000 5 fig2c 0 0.187 0.005 0.001 &

@@ -44,18 +44,19 @@ def main():
     k_val = float(sys.argv[13])
     theta_val = float(sys.argv[14])
     validation_mean = float(sys.argv[15])
+    opt_allele_to_use = int(sys.argv[16])
     
     num_bins = 0
     
     # Naming file
     
-    filename = PLOTDIR + 'validation_multiple/' 
+    filename = PLOTDIR + 'validation_multiple_one_opt/' 
         
     filename = filename + outFolder + '/'
-    solution_file = open(filename + 'per_%d_k_%.4f_theta_%.4f_sims_%d_%s_het_eps_%d_%d_%d_comm_eps_%d_%d_%d_val_mean_%.5f.txt'%(period, k_val, theta_val, num_sims, model, eps_mean_het, eps_var_het, eps_med_het, eps_mean_common, eps_var_common, eps_med_common, validation_mean), 'w') 
+    solution_file = open(filename + 'per_%d_opt_%d_k_%.4f_theta_%.4f_sims_%d_%s_het_eps_%d_%d_%d_comm_eps_%d_%d_%d_val_mean_%.5f.txt'%(period, opt_allele_to_use, k_val, theta_val, num_sims, model, eps_mean_het, eps_var_het, eps_med_het, eps_mean_common, eps_var_common, eps_med_common, validation_mean), 'w') 
     
     solution_file.write("Num sims: " + str(num_sims) + '\n')
-    solution_file.write('Number of loci used: ' + str(1000) + ' k used: ' + str(k_val) + ' theta used: ' + str(theta_val) + '\n')
+    solution_file.write('Number of loci used: ' + str(1000) + ' k used: ' + str(k_val) + ' theta used: ' + str(theta_val) + ' opt allele used: ' + str(opt_allele_to_use) + '\n')
     solution_file.write('Mean of k, theta used: ' + str(k_val*theta_val) + '\n')
     
     '''
@@ -118,7 +119,7 @@ def main():
         #opt_allele_sub_list = random.sample(opt_allele_list, 1000)
         obs_het_stats = [1,1,1]
         obs_common_stats = [1,1,1]
-        opt_allele_sub_list = random.choices(opt_allele_dic_w_per[period], k=1000)
+        opt_allele_sub_list = [(period, opt_allele_to_use)] * 1000 #random.choices(opt_allele_dic_w_per[period], k=1000)
         het_list, common_list = EstimateParam(ABC_tables, opt_allele_sub_list, k_val, theta_val, obs_het_stats, \
                                               obs_common_stats, model, eps_het, eps_common, use_common_alleles, True) 
         
@@ -135,7 +136,6 @@ def main():
         obs_common_stats = [obs_mean_common, obs_var_common, obs_med_common]
        
         accepted_params = []
-        
         total_time_1 = 0
         total_time_2 = 0
         all_time = 0
