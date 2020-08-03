@@ -4,34 +4,50 @@
 from ABC_functions import *
 from scipy.stats.distributions import chi2
 
+
 ########## LRT Helper Functions ##########
 
+"""Return list of summary statistics for given s
+
+Parameters
+----------
+file_prefix: string
+suffix_list: list
+    List of summary statistics to return
+s: float
+    S value to return summary statistics for
+    
+Returns
+-------
+transition_matrix: list
+    List of list of summary statistics
+"""
 def GetAllLRTLists(file_prefix, suffix_list, s):
     
     list_of_lists = []
     for suffix in suffix_list:
         
-        lrt_file = open(file_prefix + '_'+suffix + '.txt', 'r')
+        lrt_file = open(file_prefix + '_' + suffix + '.txt', 'r')
     
         header = lrt_file.readline().strip()
     
         for line in lrt_file:
             info = line.strip().split('\t')
             s_val = float(info[0])
-            summ_stats = info[1]
-            
-            if suffix == 'bins': # or suffix == 'bins_narrow':
-                summ_stats= [s for s in summ_stats.split(';')]
-            elif suffix == 'common':
-                summ_stats= [int(s) for s in summ_stats.split(';')]
-            else:
-                #print(lrt_file)
-                summ_stats= [float(s) for s in summ_stats.split(';')]
             
             if s_val == s:
+                summ_stats = info[1]
+            
+                if suffix == 'bins': 
+                    summ_stats= [s for s in summ_stats.split(';')]
+                elif suffix == 'common':
+                    summ_stats= [int(s) for s in summ_stats.split(';')]
+                else:
+                    summ_stats= [float(s) for s in summ_stats.split(';')]
+            
                 list_of_lists.append(summ_stats)
                 break
-        
+           
         lrt_file.close()
     
     return list_of_lists
