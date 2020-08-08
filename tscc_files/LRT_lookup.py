@@ -11,9 +11,9 @@ def main():
     s_vals = sys.argv[4]
     LRT_num_sims = int(sys.argv[5])
     s_list = [float(s) for s in s_vals.split(',')]
-    outFolder1 = '20k/'
-    outFolder2 = '50k/'
-    outFolder3 = 'eurodem/'
+    outFolder1 = '20k_upd/'
+    outFolder2 = '50k_upd/'
+    outFolder3 = 'eurodem_upd/'
     outFile1 = '/projects/ps-gymreklab/bonnieh/lrt/results/' + outFolder1 + str(per) + '_' + str(opt_allele) + '_' + str(numfile) 
     outFile2 = '/projects/ps-gymreklab/bonnieh/lrt/results/' + outFolder2 + str(per) + '_' + str(opt_allele) + '_' + str(numfile) 
     outFile3 = '/projects/ps-gymreklab/bonnieh/lrt/results/' + outFolder3 + str(per) + '_' + str(opt_allele) + '_' + str(numfile) 

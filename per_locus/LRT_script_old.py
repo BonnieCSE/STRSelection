@@ -106,11 +106,11 @@ def main():
 
             # Perform LRT
 
-            #lrtFile = '/gymreklab-tscc/bonnieh/lrt/results/' + model + '_prelim' + '/' + str(per) + '_' + str(optimal_ru) + '_freqs.txt'
+            lrtFile = '/gymreklab-tscc/bonnieh/lrt/results/' + model + '_prelim' + '/' + str(per) + '_' + str(optimal_ru) + '_freqs.txt'
 
             ### Get list of s values in LRT simulations file ###
             s_list_available = []
-            lrtFile = '/gymreklab-tscc/bonnieh/lrt/results/' + 'eurodem_upd' + '/' + str(per) + '_' + str(optimal_ru) + '_freqs.txt' # euro_prelim
+            lrtFile = '/gymreklab-tscc/bonnieh/lrt/results/' + 'euro_prelim' + '/' + str(per) + '_' + str(optimal_ru) + '_freqs.txt'
             lrt_file = open(lrtFile, 'r')
             header = lrt_file.readline().strip()
 
@@ -125,9 +125,7 @@ def main():
                 s_ABC_round = getNearestS(s_ABC_round, s_list_available)
 
             # Get LRT summary statistic tables for s = 0
-            #freqs_list_raw_0 = GetLRTListFreq(lrtFile, 0)
-            lrtFile_for_s_0 = '/gymreklab-tscc/bonnieh/lrt/results/' + 'eurodem_upd' + '/' + str(per) + '_' + str(optimal_ru) + '_15_freqs.txt' # [:-6]
-            freqs_list_raw_0 = GetLRTListByRow(lrtFile_for_s_0, 0)
+            freqs_list_raw_0 = GetLRTListFreq(lrtFile, 0)
             LRT_table_0_het = []
             LRT_table_0_common = []
             LRT_table_0_bins = []
@@ -135,18 +133,14 @@ def main():
             # Get summary statistics from allele frequencies
             for freq_string in freqs_list_raw_0:
 
-                obs_het_0, obs_common_0, obs_bins_0 = GetSummStats(freq_string, num_bins)
-                LRT_table_0_het.append(obs_het_0) 
-                LRT_table_0_common.append(obs_common_0) 
-                LRT_table_0_bins.append(obs_bins_0)
+                obs_het, obs_common, obs_bins = GetSummStats(freq_string, num_bins)
+                LRT_table_0_het.append(obs_het) 
+                LRT_table_0_common.append(obs_common) 
+                LRT_table_0_bins.append(obs_bins)
 
             # Get LRT summary statistic tables for s = s_ABC_round
-            if s_ABC_round == 0:
-                freqs_list_raw_s = GetLRTListByRow(lrtFile_for_s_0, 1)
-            else:
-                freqs_list_raw_s = GetLRTListFreq(lrtFile, s_ABC_round)
-            
-            
+            freqs_list_raw_s = GetLRTListFreq(lrtFile, s_ABC_round)
+
             LRT_table_s_het = []
             LRT_table_s_common = []
             LRT_table_s_bins = []
@@ -154,13 +148,11 @@ def main():
             # Get summary statistics from allele frequencies
             for freq_string in freqs_list_raw_s:
 
-                obs_het_s, obs_common_s, obs_bins_s = GetSummStats(freq_string, num_bins)
-                LRT_table_s_het.append(obs_het_s) 
-                LRT_table_s_common.append(obs_common_s) 
-                LRT_table_s_bins.append(obs_bins_s)
+                obs_het, obs_common, obs_bins = GetSummStats(freq_string, num_bins)
+                LRT_table_s_het.append(obs_het) 
+                LRT_table_s_common.append(obs_common) 
+                LRT_table_s_bins.append(obs_bins)
 
-            obs_bins = list(obs_bins.split(','))
-            obs_bins = list(map(float, obs_bins)) 
             # Perform LRT
             likelihood_0, likelihood_s_ABC, LR, LogLR, pval = LikelihoodRatioTest(LRT_table_0_het, LRT_table_s_het, \
                                     LRT_table_0_common, LRT_table_s_common, LRT_table_0_bins, LRT_table_s_bins, LRT_num_sims, \

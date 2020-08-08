@@ -1,4 +1,4 @@
-# Script to run ABC for all-locus/joint method 
+# Script to validate ABC for all-locus/joint method 
 
 ### Imports ###
 
@@ -89,11 +89,13 @@ def main():
     # Get ABC tables
     ABC_tables = {}
     opt_allele_dic = {}
+    opt_allele_dic[1] = [16,20,24,28,32,36,40]
     opt_allele_dic[3] = [8,9,10,11,12]
     opt_allele_dic[2] = [11,12,13,14,15,16,17,18,19,20]
     opt_allele_dic[4] = [7,8,9,10]
     
     opt_allele_dic_w_per = {}
+    opt_allele_dic_w_per[1] = [(1,16),(1,20),(1,24),(1,28),(1,32),(1,36),(1,40)]
     opt_allele_dic_w_per[3] = [(3,8),(3,9),(3,10),(3,11),(3,12)]
     opt_allele_dic_w_per[2] = [(2,11),(2,12),(2,13),(2,14),(2,15),(2,16),(2,17),(2,18),(2,19),(2,20)]
     opt_allele_dic_w_per[4] = [(4,7),(4,8),(4,9),(4,10)]

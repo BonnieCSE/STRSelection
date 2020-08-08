@@ -30,3 +30,23 @@ nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.0
 
 nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.0006 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/trinuc.txt y n y 3 euro_p3 &
 
+8/6/20
+
+nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.005 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/allele_freqs_filt.txt y n y 3 eurodem_pr1 &
+
+nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.005 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/allele_freqs_filt.txt y n y 3 eurodem_pr2 &
+
+nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.005 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/allele_freqs_filt.txt y n y 3 eurodem_pr3 &
+
+nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.005 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/allele_freqs_filt.txt y n y 5 eurodem_pr1 &
+
+nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.005 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/allele_freqs_filt.txt y n y 5 eurodem_pr2 &
+
+nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.005 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/allele_freqs_filt.txt y n y 5 eurodem_pr3 &
+
+nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.0006 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/allele_freqs_filt.txt y n y 5 eurodem_pr1 &
+
+nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.0006 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/allele_freqs_filt.txt y n y 5 eurodem_pr2 &
+
+nohup time python /storage/BonnieH/selection_project/per_locus/ABC_script.py 0.0006 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/allele_freqs/allele_freqs_filt.txt y n y 5 eurodem_pr3 &
+

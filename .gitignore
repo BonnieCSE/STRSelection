@@ -1,12 +1,15 @@
-annotations/
-old/
 *_old/
+analysis/
+annotations/
 backup/
+old/
 organized/
 parents/
+scratch/
 simulation/
 ssc_files/
 tscc_dir/
+validation_per_locus/
 .ipynb_checkpoints/
 __pycache__
 *~

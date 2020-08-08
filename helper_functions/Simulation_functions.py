@@ -190,13 +190,13 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
 
     # Get transition matrix (constant)
     transition_matrix = GetTransitionMatrix(num_alleles, mu, beta, p, L)
-
+    #print(transition_matrix)
     # Transpose transition matrix
     transition_matrix_transpose = transition_matrix.transpose()
 
     # Calculate fitness matrix for each allele pair (genotype)
     fitness_matrix = GetFitnessMatrix(num_alleles, s, PARAM_is_w_additive)
-
+    #print(fitness_matrix)
     t = 0 # Number of iterations of while loop
 
     het_list = []
@@ -274,8 +274,10 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
         allele_freqs = np.matmul(transition_matrix_transpose, allele_freqs)
         
         if use_drift == True:
+            #print(t)
+            #print(allele_freqs)
             # Use multinomial sampling
-            allele_counts = np.random.multinomial(4*N_e, allele_freqs)
+            allele_counts = np.random.multinomial(2*N_e, allele_freqs)
 
             # Rescale allele_freqs to sum to 1
             rowsum = np.sum(allele_counts)
@@ -287,6 +289,7 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
     # End sampling step
     # Use multinomial sampling on smaller sample size
     if end_samp_n > 0:
+        
         allele_counts = np.random.multinomial(end_samp_n, allele_freqs)
 
         # Rescale allele_freqs to sum to 1
@@ -296,4 +299,4 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
     if return_stats == False:
         return allele_freqs_20k, allele_freqs_50k, allele_freqs
     else:
-        return allele_freqs_20k, allele_freqs, het_list, var_list
+        return allele_freqs_50k, allele_freqs, het_list, var_list
