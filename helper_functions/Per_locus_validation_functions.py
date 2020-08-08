@@ -1,3 +1,8 @@
+'''This file contain helper functions for per-locus validation
+'''
+
+########## Imports ##########
+
 from LRT_functions import *
 from scipy import stats
 
@@ -138,25 +143,19 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
                 else:
                     no_ABC_accept = no_ABC_accept + 1
                     
-            #print('s: ' + str(s))
-            #print(list_est_s)
-            #print(list_het)
-            #print(list_bins)
-            #print('No ABC accept')
-            #print(no_ABC_accept)
             est_s_dic[s] = list_est_s
             obs_het_dic_lrt[s] = list_het
             obs_comm_dic_lrt[s] = list_common
             obs_bins_dic_lrt[s] = list_bins
             
-            # Put mean of esimated s in s_vals_dic and calculate standard error of the mean
+            # Put mean of esimated s in s_vals_dic and calculate standard deviation
             s_vals_dic[opt_allele].append(np.mean(list_est_s)) 
             #std_err = stats.sem(list_est_s, ddof=0)
             std_err = np.std(list_est_s)
             errors_s_dic[opt_allele].append(std_err)
             
         # Get LRT summary statistic tables for s = 0
-        lrtFile_for_s_0 = '/gymreklab-tscc/bonnieh/lrt/results/' + lrt_model + '/' + str(per) + '_' + str(opt_allele) + '_15_freqs.txt' # [:-6]
+        lrtFile_for_s_0 = '/gymreklab-tscc/bonnieh/lrt/results/' + lrt_model + '/' + str(per) + '_' + str(opt_allele) + '_15_freqs.txt' 
         freqs_list_raw_0 = GetLRTListByRow(lrtFile_for_s_0, 0)
         #freqs_list_raw_0 = GetLRTListFreq(lrtFile, 0)
         LRT_table_0_het = []
@@ -223,8 +222,7 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
                         LogLR_list.append(LogLR)
                         l0_list.append(likelihood_0)
                         ls_list.append(likelihood_s_ABC)
-            #print('s: ' + str(s))
-            #print(LRlog_list)   
+               
             # Put power of p values in p_vals_dic 
             LogLR_vals_dic[opt_allele] = LogLR_list
             p_vals_dic[opt_allele].append(len([i for i in p_vals_list if i < 0.05])/len(p_vals_list)*100) 

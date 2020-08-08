@@ -19,7 +19,7 @@ s: float
     
 Returns
 -------
-transition_matrix: list
+list_of_lists: list
     List of list of summary statistics
 """
 def GetAllLRTLists(file_prefix, suffix_list, s):
@@ -97,7 +97,7 @@ def GetLRTListFreq(lrtFile, s_ABC):
     freqs_list = []
     return freqs_list
 
-# Get list of frequencies for given s value
+# Get list of frequencies from certain row in file
 def GetLRTListByRow(lrtFile, row_num):
     lrt_file = open(lrtFile, 'r')
     header = lrt_file.readline().strip()

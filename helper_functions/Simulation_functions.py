@@ -1,6 +1,7 @@
 '''
 Functions for mutation model, selection model, and simulation algorithm 
 ''' 
+
 ########## Imports ##########
 
 import numpy as np
@@ -167,10 +168,6 @@ use_drift: bool
     Whether to perform multinomial sampling step at each generation
 set_start_equal: bool
     Whether to set starting vector of allele frequencies as equal
-    
-Returns
--------
-
 """
 def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_stats=False, use_drift=True, set_start_equal=False):
 
@@ -190,18 +187,18 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
 
     # Get transition matrix (constant)
     transition_matrix = GetTransitionMatrix(num_alleles, mu, beta, p, L)
-    #print(transition_matrix)
+    
     # Transpose transition matrix
     transition_matrix_transpose = transition_matrix.transpose()
 
     # Calculate fitness matrix for each allele pair (genotype)
     fitness_matrix = GetFitnessMatrix(num_alleles, s, PARAM_is_w_additive)
-    #print(fitness_matrix)
+    
     t = 0 # Number of iterations of while loop
 
     het_list = []
     var_list = []
-    #opt_freq_list = []
+    
     while t < max_iter:
         
         if return_stats == True and t % 100 == 0 and t < max_iter - 5920:
@@ -209,8 +206,6 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
             het_list.append(het)
             var = GetVar(allele_freqs)
             var_list.append(var)
-            #middle_index = int(len(allele_freqs)/2)
-            #opt_freq_list.append(allele_freqs[middle_index])
             
         # Get allele frequencies at 20k generations
         if t == 20000:
@@ -223,9 +218,8 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
 
                 allele_freqs_20k = allele_counts/rowsum
 
-            
         # Get allele frequencies before incorporating European demographics 
-        if t == 50000: # if t == 20000
+        if t == 50000: 
             allele_freqs_50k = copy.deepcopy(allele_freqs)
             if end_samp_n > 0:
                 allele_counts = np.random.multinomial(end_samp_n, allele_freqs_50k)
@@ -263,9 +257,6 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
         # Calculate covariance matrix
         covariance_matrix = GetCovarianceMatrix(allele_freqs)
 
-        # Save previous allele_freqs
-        # allele_freqs_prev = copy.deepcopy(allele_freqs)
-
         # Calculate new allele_freqs
         # Applying selection
         allele_freqs = allele_freqs + (np.matmul(covariance_matrix, gradient))/(2*mean_fitness)
@@ -274,8 +265,7 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
         allele_freqs = np.matmul(transition_matrix_transpose, allele_freqs)
         
         if use_drift == True:
-            #print(t)
-            #print(allele_freqs)
+            
             # Use multinomial sampling
             allele_counts = np.random.multinomial(2*N_e, allele_freqs)
 
@@ -296,6 +286,7 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
         rowsum = np.sum(allele_counts)
 
         allele_freqs = allele_counts/rowsum
+        
     if return_stats == False:
         return allele_freqs_20k, allele_freqs_50k, allele_freqs
     else:
