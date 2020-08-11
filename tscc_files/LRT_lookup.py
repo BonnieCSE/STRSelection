@@ -1,3 +1,5 @@
+# Generate LRT lookup table on TSCC
+
 import sys 
 sys.path.append("/projects/ps-gymreklab/bonnieh/helper_functions")
 from Simulation_functions import *
@@ -11,9 +13,9 @@ def main():
     s_vals = sys.argv[4]
     LRT_num_sims = int(sys.argv[5])
     s_list = [float(s) for s in s_vals.split(',')]
-    outFolder1 = '20k_upd/'
-    outFolder2 = '50k_upd/'
-    outFolder3 = 'eurodem_upd/'
+    outFolder1 = '20k_0810/'
+    outFolder2 = '50k_0810/'
+    outFolder3 = 'eurodem_0810/'
     outFile1 = '/projects/ps-gymreklab/bonnieh/lrt/results/' + outFolder1 + str(per) + '_' + str(opt_allele) + '_' + str(numfile) 
     outFile2 = '/projects/ps-gymreklab/bonnieh/lrt/results/' + outFolder2 + str(per) + '_' + str(opt_allele) + '_' + str(numfile) 
     outFile3 = '/projects/ps-gymreklab/bonnieh/lrt/results/' + outFolder3 + str(per) + '_' + str(opt_allele) + '_' + str(numfile) 
@@ -85,19 +87,19 @@ def main():
 
     L1_log = 0.04
     L2_log = 0.15 
-    L3_log = 0.65 
+    L3_log = 0.33
     L4_log = 0.45 
 
     # mu, beta, p, l
     period_info[1] = [10**-4.2, 0.5, 1, L1_log, 13]
     period_info[2] = [10**-5, 0.3, 0.6, L2_log, 6]
-    period_info[3] = [10**-7, 0.3, 0.9, L3_log, 5]
+    period_info[3] = [10**-5.5, 0.3, 0.9, L3_log, 5] 
     period_info[4] = [10**-6, 0.3, 0.9, L4_log, 3]
 
     num_alleles = 25
-    N_e = 7300
+    N_e = 7310
     max_iter = 55920
-    end_samp_n = 8000
+    end_samp_n = 6500
     
     log_mu_prime = np.log10(period_info[per][0])+period_info[per][3]*(opt_allele - period_info[per][4])
     mu_prime = 10**log_mu_prime
