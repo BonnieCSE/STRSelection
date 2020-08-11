@@ -10,7 +10,6 @@ while IFS=$'\t' read -r -a line; do
     JOBNAME="${PERIOD}_${OPTIMAL_ALLELE}_${OUT_FOLDER}_${FILENUM}"
     NUM_SIMS=${line[6]}
     
-    
     echo Running ABC for $JOBNAME 
-    cat ABC_job.sh | sed "s/jobname/${JOBNAME}/g" | sed "s#per#${PERIOD}#g" | sed "s#opt#${OPTIMAL_ALLELE}#g" |  sed "s#num_sims#${NUM_SIMS}#g" | sed "s#k_param#${K_PARAM}#g" | sed "s#theta_param#${THETA_PARAM}#g" | sed "s#filenum#${FILENUM}#g" | sed "s/out_folder/${OUT_FOLDER}/g" |qsub
+    cat ABC_job.sh | sed "s/jobname/${JOBNAME}/g" | sed "s#per#${PERIOD}#g" | sed "s#opt#${OPTIMAL_ALLELE}#g" | sed "s#num_sims#${NUM_SIMS}#g" | sed "s#k_param#${K_PARAM}#g" | sed "s#theta_param#${THETA_PARAM}#g" | sed "s#filenum#${FILENUM}#g" | sed "s/out_folder/${OUT_FOLDER}/g" | qsub
 done < "$file"
