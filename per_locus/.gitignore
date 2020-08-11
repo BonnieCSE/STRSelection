@@ -1,3 +1,8 @@
 results/
 final_results/
+SISTR_results/
+ABC_script.py
+LRT_script.py
+commands_ABC.txt
+commands_LRT.txt
 *_old.py

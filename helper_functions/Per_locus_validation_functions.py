@@ -1,5 +1,4 @@
-'''This file contain helper functions for per-locus validation
-'''
+# This file contain helper functions for per-locus validation
 
 ########## Imports ##########
 

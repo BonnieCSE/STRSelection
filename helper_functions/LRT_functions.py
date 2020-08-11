@@ -1,13 +1,13 @@
-'''This file contain helper functions for LRT
-'''
+# This file contain helper functions for performing LRT
+
+########## Imports ##########
 
 from ABC_functions import *
 from scipy.stats.distributions import chi2
 
-
 ########## LRT Helper Functions ##########
 
-
+# Survival function for mixture distribution
 def SF(x):
     if x > 0:
         return 0
@@ -186,10 +186,10 @@ def LikelihoodRatioTest(LRT_table_0_het, LRT_table_s_het, LRT_table_0_common, LR
      
     LR = likelihood_0/likelihood_s_ABC
    
-    # LogLR ~ Chi-squared
+    # Calculate LogLR 
     LogLR = -2*np.log(LR)
   
-    # High p means s = 0 is more likely than s != 0
+    # LogLR ~ Mixture distribution (50% 0, 50% Chi-square (df=1))
     #pval = chi2.sf(LogLR, 1) 
     pval = 0.5*SF(LogLR) + 0.5*chi2.sf(LogLR, 1)
     return likelihood_0, likelihood_s_ABC, LR, LogLR, pval

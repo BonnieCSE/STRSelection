@@ -1,5 +1,4 @@
-'''This file contains helper functions for ABC
-'''
+# This file contains helper functions for performing ABC
 
 ########## Imports ##########
 
@@ -31,6 +30,7 @@ def GetBins(allele_freqs, num_bins):
     return bins
 
 ### Get summary statistics ###
+# Return heterozygosity, number of common alleles, obs_bins (if num_bins > 0)
 def GetSummStats(freq_string, num_bins):
     allele_freqs = [float(freq) for freq in freq_string.split(',')]
     obs_het = 1-sum([item**2 for item in allele_freqs])
@@ -87,7 +87,7 @@ def Process_Freqs(freqs, per, end, start, return_freqs=True):
     ref_length_bp = end - start + 1
     ref_length_ru = int(ref_length_bp/per)
 
-    # Get optimal allele repeat unit length and add to abc_combos dictionary
+    # Get optimal allele repeat unit length 
     opt_allele = ref_length_ru + opt_allele_rel
     
     if return_freqs == False:
@@ -105,8 +105,8 @@ def Process_Freqs(freqs, per, end, start, return_freqs=True):
         # Get highest absolute value in list
         max_allele = abs(max(allele_list, key=abs))
 
-        # Get allele freqs
-        allele_freqs = [0] * (2*max_allele+1) #np.zeros(2*max_allele+1)
+        # Put allele freqs in list
+        allele_freqs = [0] * (2*max_allele+1) 
         for key in freqs_dic_final:
             allele_freq = freqs_dic_final[key]/pop_size
             allele_freqs[max_allele+key] = allele_freq
@@ -120,7 +120,6 @@ def GetEpsilonHet(obs_het, constant_het, denom_het):
 
 ### Get epsilon for number of common alleles ###
 def GetEpsilonCommon(obs_common, constant_common, denom_common):
-    
     epsilon = obs_common/denom_common + constant_common
     return math.floor(epsilon)
 
@@ -211,8 +210,8 @@ def Get_S_ABC(abc_list, obs_het, obs_common, obs_bins, constant_het,
     
     if num_accepted >= 10:
         median_s = np.median(s_accepted)
-        lower_bound = np.percentile(s_accepted, 2.5) #2.5
-        upper_bound = np.percentile(s_accepted, 97.5) #97.5
+        lower_bound = np.percentile(s_accepted, 2.5) 
+        upper_bound = np.percentile(s_accepted, 97.5) 
         
         # Comment out rounding
         '''

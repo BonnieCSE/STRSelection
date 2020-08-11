@@ -1,6 +1,4 @@
-'''
-Functions for mutation model, selection model, and simulation algorithm 
-''' 
+# Functions for mutation model, selection model, and simulation algorithm 
 
 ########## Imports ##########
 
@@ -236,13 +234,13 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
         if t == max_iter - 2040:
             N_e = 1861
             
-        if t == max_iter-920:
+        if t == max_iter - 920:
             N_e = 1032
         
-        if t > max_iter-920 and t < max_iter-205:
+        if t > max_iter - 920 and t < max_iter - 205:
             N_e = N_e * 1.00307
         
-        if t >= max_iter-205:
+        if t >= max_iter - 205:
             N_e = N_e * 1.0195
             
         # Calculate marginal fitness w*(a[i]) for each allele
