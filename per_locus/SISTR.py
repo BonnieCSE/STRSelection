@@ -1,5 +1,5 @@
 # Script to run SISTR: 
-# Method to infer posterior estimate of s and corresponding p value for each STR
+# Method to obtain posterior estimate of s and corresponding p value for each STR
 
 ### Imports ###
 

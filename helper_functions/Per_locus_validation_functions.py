@@ -26,7 +26,7 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
     eps_bins = 0.3
     
     # LRT parameters
-    LRT_num_sims = 200
+    LRT_num_sims = 2000
          
     # Each dictionary contains values for all optimal alleles
     # Key: optimal allele
@@ -49,7 +49,7 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
     for opt_allele in opt_allele_list:
         if all_pers == True:
             per = 2
-            if opt_allele == 6 or opt_allele == 12:
+            if opt_allele == 5 or opt_allele == 13:
                 per = 3
             if opt_allele == 7 or opt_allele == 10:
                 per = 4
@@ -92,7 +92,7 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
             obs_comm_dic[s] = []
             obs_bins_dic[s] = []
             
-            freqs_list_raw = GetLRTListFreq(lrtFile, s) # Get list of allele frequencies for this s
+            freqs_list_raw = GetLRTListFreq200(lrtFile, s) # Get list of allele frequencies for this s
             
             # Get summary statistics from frequencies
             for freq_string in freqs_list_raw:
