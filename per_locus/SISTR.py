@@ -41,9 +41,9 @@ def main():
     filename = str(constant_het) + "_" + str(denom_het) + "_" + str(eps_bins) + \
                "_" + use_het + use_common + use_bins + str(num_bins) + "_" + abc_model + file_type
     
-    outFile = '/storage/BonnieH/selection_project/per_locus/results/' + filename + '.txt'
-    figFile = '/storage/BonnieH/selection_project/per_locus/results/figs/' + filename + '.png'
-    statsFile = '/storage/BonnieH/selection_project/per_locus/results/stats/' + filename + '.txt'
+    outFile = '/storage/BonnieH/selection_project/per_locus/SISTR_results/' + filename + '.txt'
+    figFile = '/storage/BonnieH/selection_project/per_locus/SISTR_results/figs/' + filename + '.png'
+    statsFile = '/storage/BonnieH/selection_project/per_locus/SISTR_results/stats/' + filename + '.txt'
     
     # Open output files
     allele_freqs_file = open(inFile, 'r')
@@ -54,8 +54,8 @@ def main():
     results.write("chrom" + "\t" + "start" + "\t" + "end" + "\t" + "total" + "\t" + "period" + \
                   "\t" + "optimal_ru" + "\t" + "motif" + "\t" + "coding" + "\t"  + 'intron' + \
                   '\t' + 'UTR5' + '\t' + 'UTR3' + '\t' + 'promoter5kb' + '\t' + 'intergenic' + \
-                  "\t" + "gene" + "\t" + "het" + "\t" + "common" + "\t" + "bins" + "\t" + \
-                  "ABC_s_median" + "\t" + "ABC_s_95%_CI" + "\t" + "Num_s_accepted" + "\t" + \
+                  "\t" + "tss_gene" + "\t" + "het" + "\t" + "common" + "\t" + "bins" + "\t" + \
+                  "ABC_s_median" + "\t" + "ABC_s_95%_CI" + "\t" + "Num_s_accepted_(max_10000)" + "\t" + \
                   "Likelihood_0" + "\t" + "Likelihood_s" + "\t" + "LR" + "\t" + "LogLR" + \
                   "\t" + "LRT_p_value" + "\n")
 
@@ -121,7 +121,8 @@ def main():
         if per == 2 and opt_allele < 11:
             opt_allele = 11
             
-        abcFile = '/gymreklab-tscc/bonnieh/abc/results/' + abc_model +'/' + str(per) + '_' + str(opt_allele) + '.txt' 
+        abcFile = '/gymreklab-tscc/bonnieh/abc/results/' + abc_model + '/' + \
+        str(per) + '_' + str(opt_allele) + '.txt' 
         
         # Read abcFile line by line and place in lookup table in the form of a list
         abc_list = GetABCList(abcFile, num_bins)
@@ -177,18 +178,17 @@ def main():
 
             ABC_conf_int = '(' + str(lower_bound) + ' , ' + str(upper_bound) + ')'
 
-            
             results.write(str(s_ABC) + '\t' + ABC_conf_int + '\t' + str(num_accepted) + '\t')
 
             s_ABC_round = get_LRT_bin(s_ABC)
 
             # Perform LRT
 
-            #lrtFile = '/gymreklab-tscc/bonnieh/lrt/results/' + model + '_prelim' + '/' + str(per) + '_' + str(optimal_ru) + '_freqs.txt'
-
             ### Get list of s values in LRT simulations file ###
             s_list_available = []
-            lrtFile = '/gymreklab-tscc/bonnieh/lrt/results/' + lrt_model + '/' + str(per) + '_' + str(optimal_ru) + '_freqs.txt' # euro_prelim
+            lrtFile = '/gymreklab-tscc/bonnieh/lrt/results/' + lrt_model + '/' \
+            + str(per) + '_' + str(opt_allele) + '_freqs.txt' 
+            
             lrt_file = open(lrtFile, 'r')
             header = lrt_file.readline().strip()
 
@@ -203,8 +203,8 @@ def main():
                 s_ABC_round = getNearestS(s_ABC_round, s_list_available)
 
             # Get LRT summary statistic tables for s = 0
-            #freqs_list_raw_0 = GetLRTListFreq(lrtFile, 0)
-            lrtFile_for_s_0 = '/gymreklab-tscc/bonnieh/lrt/results/' + lrt_model + '/' + str(per) + '_' + str(optimal_ru) + '_15_freqs.txt' # [:-6]
+            
+            lrtFile_for_s_0 = '/gymreklab-tscc/bonnieh/lrt/results/' + lrt_model + '/' + str(per) + '_' + str(opt_allele) + '_15_freqs.txt' 
             freqs_list_raw_0 = GetLRTListByRow(lrtFile_for_s_0, 0)
             LRT_table_0_het = []
             LRT_table_0_common = []
@@ -224,7 +224,6 @@ def main():
             else:
                 freqs_list_raw_s = GetLRTListFreq(lrtFile, s_ABC_round)
             
-            
             LRT_table_s_het = []
             LRT_table_s_common = []
             LRT_table_s_bins = []
@@ -237,11 +236,10 @@ def main():
                 LRT_table_s_common.append(obs_common_s) 
                 LRT_table_s_bins.append(obs_bins_s)
 
-            obs_bins = list(obs_bins.split(','))
-            obs_bins = list(map(float, obs_bins)) 
             # Perform LRT
-            likelihood_0, likelihood_s_ABC, LR, LogLR, pval = LikelihoodRatioTest(LRT_table_0_het, LRT_table_s_het, \
-                                    LRT_table_0_common, LRT_table_s_common, LRT_table_0_bins, LRT_table_s_bins, LRT_num_sims, \
+            likelihood_0, likelihood_s_ABC, LR, LogLR, pval = LikelihoodRatioTest(LRT_table_0_het, \
+                                    LRT_table_s_het, LRT_table_0_common, LRT_table_s_common, \
+                                    LRT_table_0_bins, LRT_table_s_bins, LRT_num_sims, \
                                     obs_het, obs_common, obs_bins, constant_het, denom_het, \
                                     constant_common, denom_common, eps_bins, use_het, use_common, use_bins)
 
@@ -273,7 +271,7 @@ def main():
     
     plt.hist(s_acc, bins=buckets, weights=np.ones(len(s_acc)) / len(s_acc))
 
-    plt.title('Percent s accepted during ABC %s model \n const_het %.5f, denom_het = %d, num_bins = %d \n Summ stats used: het = %s common alleles = %s bins = %s'%(model, constant_het, denom_het, num_bins, use_het, use_common, use_bins))
+    plt.title('Percent s accepted during ABC %s model \n const_het %.5f, denom_het = %d, num_bins = %d \n Summ stats used: het = %s common alleles = %s bins = %s'%(abc_model, constant_het, denom_het, num_bins, use_het, use_common, use_bins))
     plt.xlabel("% s accepted")
     plt.ylabel("Frequency")
     plt.savefig(figFile, bbox_inches='tight')
