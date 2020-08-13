@@ -49,7 +49,7 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
     for opt_allele in opt_allele_list:
         if all_pers == True:
             per = 2
-            if opt_allele == 5 or opt_allele == 13:
+            if opt_allele == 5 or opt_allele == 13 or opt_allele == 6 or opt_allele == 12:
                 per = 3
             if opt_allele == 7 or opt_allele == 10:
                 per = 4
