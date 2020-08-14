@@ -1,6 +1,8 @@
 results/
 final_results/
 SISTR_results/
+SISTR_results_backup/
+SISTR_results_processed/
 ABC_script.py
 LRT_script.py
 commands_ABC.txt

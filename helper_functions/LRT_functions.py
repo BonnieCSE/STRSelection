@@ -105,7 +105,7 @@ def GetLRTListFreq(lrtFile, s_ABC):
     return freqs_list
 
 # Get list of 200 frequencies for given s value
-def GetLRTListFreq200(lrtFile, s_ABC):
+def GetLRTListFreq200(lrtFile, s_ABC, return_first_200=True):
     lrt_file = open(lrtFile, 'r')
     header = lrt_file.readline().strip()
     lrt_list = []
@@ -117,7 +117,10 @@ def GetLRTListFreq200(lrtFile, s_ABC):
             freqs = info[1]
             freqs_list = [freq for freq in freqs.split(';')]
             lrt_file.close()
-            return freqs_list[0:200]
+            if return_first_200==True:
+                return freqs_list[0:200]
+            else:
+                return freqs_list[200:400]
        
        
     lrt_file.close()

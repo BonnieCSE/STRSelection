@@ -8,7 +8,7 @@ from scipy import stats
 ########## Per-locus Validation Functions ##########
 
 def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
-                       num_bins, abc_model, lrt_model, all_pers=False):
+                       num_bins, abc_model, lrt_model, all_pers=False, first_200=True):
     
     # Process list of optimal alleles
     opt_allele_list = list(opt_allele.split(','))
@@ -26,7 +26,7 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
     eps_bins = 0.3
     
     # LRT parameters
-    LRT_num_sims = 2000
+    LRT_num_sims = 2000 # Change back to 2000!
          
     # Each dictionary contains values for all optimal alleles
     # Key: optimal allele
@@ -51,7 +51,7 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
             per = 2
             if opt_allele == 5 or opt_allele == 13 or opt_allele == 6 or opt_allele == 12:
                 per = 3
-            if opt_allele == 7 or opt_allele == 10:
+            if opt_allele == 7 or opt_allele == 10 or opt_allele == 8 or opt_allele == 9:
                 per = 4
         LogLR_list = []
         l0_list = []
@@ -93,7 +93,8 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
             obs_bins_dic[s] = []
             
             freqs_list_raw = GetLRTListFreq200(lrtFile, s) # Get list of allele frequencies for this s
-            
+            if first_200 == False:
+                freqs_list_raw = GetLRTListFreq200(lrtFile, s, False)
             # Get summary statistics from frequencies
             for freq_string in freqs_list_raw:
                 
@@ -209,6 +210,12 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
                     LRT_table_s_common.append(obs_common_s_ABC) 
                     LRT_table_s_bins.append(obs_bins_s_ABC)
                 
+                LRT_table_0_het = LRT_table_0_het[0:LRT_num_sims]
+                LRT_table_s_het = LRT_table_s_het[0:LRT_num_sims]
+                LRT_table_0_common = LRT_table_0_common[0:LRT_num_sims]
+                LRT_table_s_common = LRT_table_s_common[0:LRT_num_sims]
+                LRT_table_0_bins = LRT_table_0_bins[0:LRT_num_sims]
+                LRT_table_s_bins = LRT_table_s_bins[0:LRT_num_sims]
                 if len(LRT_table_s_het) != 0:
                     likelihood_0, likelihood_s_ABC, LR, LogLR, pval = LikelihoodRatioTest(LRT_table_0_het, LRT_table_s_het, \
                                 LRT_table_0_common, LRT_table_s_common, LRT_table_0_bins, LRT_table_s_bins, LRT_num_sims, \
