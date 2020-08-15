@@ -8,7 +8,7 @@ from scipy import stats
 ########## Per-locus Validation Functions ##########
 
 def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
-                       num_bins, abc_model, lrt_model, all_pers=False, first_200=True):
+                       num_bins, abc_model, lrt_model, all_pers=False, first_200=True, trials_2000=False, LRT_200=False):
     
     # Process list of optimal alleles
     opt_allele_list = list(opt_allele.split(','))
@@ -27,7 +27,8 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
     
     # LRT parameters
     LRT_num_sims = 2000 # Change back to 2000!
-         
+    if LRT_200 == True:
+        LRT_num_sims = 200
     # Each dictionary contains values for all optimal alleles
     # Key: optimal allele
     # Value: list of mean values for each s 
@@ -95,6 +96,8 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
             freqs_list_raw = GetLRTListFreq200(lrtFile, s) # Get list of allele frequencies for this s
             if first_200 == False:
                 freqs_list_raw = GetLRTListFreq200(lrtFile, s, False)
+            if trials_2000 == True:
+                freqs_list_raw = GetLRTListFreq(lrtFile, s)
             # Get summary statistics from frequencies
             for freq_string in freqs_list_raw:
                 
