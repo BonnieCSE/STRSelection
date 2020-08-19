@@ -1,0 +1,14 @@
+results/
+figures/
+old/
+joint_method_validation_mult.py
+joint_method_validation_mult_one_opt_allele.py
+joint_method_validation_one_opt.py
+generate_k_theta_pairs_mult_opt.ipynb
+generate_k_theta_pairs_one_opt.ipynb
+fig2c_validation_mult_one_opt.ipynb
+Figure2d_JointMethodValidation.ipynb
+generate*.ipynb
+graph_het_distr.ipynb
+graph_pdf_discrete.ipynb
+commands.txt
