@@ -167,6 +167,7 @@ def main():
     solution_file.write('Ground truth means: ' + ','.join(str(item) for item in gt_mean)+ '\n')
     solution_file.write('Ground truth vars: ' + ','.join(str(item) for item in gt_var)+ '\n')
     solution_file.write('Ground truth meds: ' + ','.join(str(item) for item in gt_med)+ '\n')
+    solution_file.write('List of medians: ' + ','.join(str(item) for item in list_of_medians)+ '\n')
     solution_file.close()
     
 if __name__ == '__main__':
