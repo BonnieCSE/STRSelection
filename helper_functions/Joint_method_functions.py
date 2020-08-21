@@ -4,6 +4,36 @@ import time
 import statistics
 ########## Joint Method Helper Functions ##########
 
+def GetGammaBins(k, theta):
+    num_sims = 10000
+    s = [] # List of s values drawn from gamma distribution
+    for i in range(0, num_sims):
+        s_val = np.random.gamma(k, theta)
+        if s_val > 1:
+            s_val = 1
+        s.append(s_val)
+
+    # List of binned s values
+    # Bins: 0<=s<10^-4, 10^-4<=s<10^-3, 10^-3<=s<10^-2, s>=10^-2
+    svals = [0, 0, 0, 0] 
+    for elem in s:
+        if elem < 10**-4:
+            svals[0] += 1
+        elif elem < 10**-3:
+            svals[1] += 1
+        elif elem < 10**-2:
+            svals[2] += 1
+        elif elem >= 10**-2:
+            svals[3] += 1
+    
+    total = sum(svals)
+    for i in range(0, len(svals)):
+        svals[i] = svals[i]/total
+        
+    return svals
+
+    
+
 def GetL1Norm(allele_freqs_prev, allele_freqs):
     diff_vector = np.absolute(allele_freqs_prev - allele_freqs)
     return np.sum(diff_vector)
@@ -132,6 +162,8 @@ def EstimateParam(ABC_tables, opt_allele_list, shape, scale, obs_het_stats, \
         sim_mean_common = np.mean(common_list)
         sim_var_common = np.var(common_list)
         sim_med_common = np.median(common_list)
+        
+        #print((shape, scale, sim_mean_het, sim_var_het, sim_med_het))
         '''
         params_accept = [1,1,1,1,1,1]
         if abs(obs_het_stats[0] - sim_mean_het) < obs_het_stats[0]/eps_het[0]:
@@ -173,7 +205,7 @@ def EstimateParam(ABC_tables, opt_allele_list, shape, scale, obs_het_stats, \
             return False, time1, time2
         '''
         
-        if abs(obs_het_stats[0] - sim_mean_het) < (obs_het_stats[0])/eps_het[0] and abs(obs_het_stats[1] - sim_var_het) < (obs_het_stats[1])/eps_het[1] and abs(obs_het_stats[2] - sim_med_het) < ((obs_het_stats[2])+0.005)/eps_het[2]:
+        if abs(obs_het_stats[0] - sim_mean_het) < (obs_het_stats[0] + 0.005)/eps_het[0] and abs(obs_het_stats[1] - sim_var_het) < (obs_het_stats[1])/eps_het[1] and abs(obs_het_stats[2] - sim_med_het) < (obs_het_stats[2]+0.005)/eps_het[2]:
             if use_common_alleles == False:
                 return True, time1, time2
             if abs(obs_common_stats[0] - sim_mean_common) < (obs_common_stats[0])/eps_common[0] and abs(obs_common_stats[1] - sim_var_common) < (obs_common_stats[1])/eps_common[1] and abs(obs_common_stats[2] - sim_med_common) < (obs_het_stats[2])/eps_common[2]:
@@ -183,3 +215,31 @@ def EstimateParam(ABC_tables, opt_allele_list, shape, scale, obs_het_stats, \
         else:
             return False, time1, time2
         
+        
+        '''
+        params_accept = [1,1,1,1,1,1]
+        if abs(obs_het_stats[0] - sim_mean_het) < (obs_het_stats[0]+0.005)/eps_het[0]:
+            params_accept[0] = 0
+        
+        if abs(obs_het_stats[1] - sim_var_het) < obs_het_stats[1]/eps_het[1]:
+            params_accept[1] = 0
+            
+        if abs(obs_het_stats[2] - sim_med_het) < (obs_het_stats[2]+0.005)/eps_het[2]:
+            params_accept[2] = 0
+            
+        if abs(obs_common_stats[0] - sim_mean_common) < obs_common_stats[0]/eps_common[0]:
+            params_accept[3] = 0
+            
+        if abs(obs_common_stats[1] - sim_var_common) < obs_common_stats[1]/eps_common[1]:
+            params_accept[4] = 0
+            
+        if abs(obs_common_stats[2] - sim_med_common) < obs_het_stats[2]/eps_common[2]:
+            params_accept[5] = 0
+            
+        if use_common_alleles == False:
+            if 1 in params_accept[0:3]:
+                return False, [sim_mean_het, sim_var_het, sim_med_het], params_accept
+            else:
+                return True, [sim_mean_het, sim_var_het, sim_med_het], params_accept
+        '''
+                

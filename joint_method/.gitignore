@@ -10,5 +10,12 @@ fig2c_validation_mult_one_opt.ipynb
 Figure2d_JointMethodValidation.ipynb
 generate*.ipynb
 graph_het_distr.ipynb
+graph_pdf.ipynb
 graph_pdf_discrete.ipynb
+plot_het_real_data.ipynb
+plot_het_sim_data.ipynb
+plot_prior.ipynb
+test.ipynb
+joint_method-Copy1.py
 commands.txt
+nohup.out
