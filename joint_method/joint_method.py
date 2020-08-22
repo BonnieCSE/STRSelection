@@ -133,6 +133,8 @@ def main():
     obs_common_distr = []
     if len(opt_allele_list) <= num_loci:
         opt_allele_sub_list = opt_allele_list
+        obs_het_distr = obs_het_distr_all
+        obs_common_distr = obs_common_distr_all
         
     else:
         
@@ -174,6 +176,7 @@ def main():
     solution_file.write('Median of observed number of common alleles: ' + str(obs_med_common) + '\n')
        
     accepted_params = []
+    info = []
     total_time_1 = 0
     total_time_2 = 0
     all_time = 0
@@ -185,36 +188,40 @@ def main():
         mean = np.random.lognormal(mu, sigma)
         theta = mean/k
         t1 = time.time()
-        toAdd, time1, time2 = EstimateParam(ABC_tables, opt_allele_sub_list, k, theta, obs_het_stats, \
-                              obs_common_stats, model, eps_het, eps_common, use_common_alleles)
+        toAdd, time1, time2 = EstimateParam(ABC_tables, \
+                                       opt_allele_sub_list, k, theta, obs_het_stats, obs_common_stats, model, \
+                                       eps_het, eps_common, use_common_alleles)
         t2 = time.time()
         all_time = all_time + t2-t1
         
-        total_time_1  = total_time_1 + time1
-        total_time_2 = total_time_2 + time2
+        #info.append((mean_fit, var_fit, med_fit, sim_mean_het, sim_var_het, sim_med_het))
         if toAdd == True:
             accepted_params.append((k, theta))
             
     solution_file.write('Number k,theta pairs accepted: ' + str(len(accepted_params)) + '\n')
     
-    sort_mean = sorted(accepted_params, key=lambda x: x[0]*x[1])
-    list_of_means = []
-    for pair in sort_mean:
-        list_of_means.append(pair[0]*pair[1])
+    if len(accepted_params) > 0:
+        sort_mean = sorted(accepted_params, key=lambda x: x[0]*x[1])
+        list_of_means = []
+        for pair in sort_mean:
+            list_of_means.append(pair[0]*pair[1])
 
-    num_accepted = len(accepted_params)
-    middle_index = int(num_accepted/2)
-    
-    solution_file.write('Sorted by mean - Median k, theta:\n')
-    solution_file.write(str(sort_mean[middle_index][0]) + ',' + str(sort_mean[middle_index][1])+ '\n')
-    solution_file.write('Median mean: ' + str(np.median(list_of_means)) + '\n')
-    mean_lower_bound = np.percentile(list_of_means, 2.5)
-    mean_upper_bound = np.percentile(list_of_means, 97.5)
-    solution_file.write('2.5 percentile mean: ' + str(mean_lower_bound) + '\n')
-    solution_file.write('97.5 percentile mean: ' + str(mean_upper_bound) + '\n')
-    
-    solution_file.write('Accepted params: ' + ', '.join(str(item) for item in accepted_params))
+        num_accepted = len(accepted_params)
+        middle_index = int(num_accepted/2)
 
+        solution_file.write('Sorted by mean - Median k, theta:\n')
+        solution_file.write(str(sort_mean[middle_index][0]) + ',' + str(sort_mean[middle_index][1])+ '\n')
+        solution_file.write('Median mean: ' + str(np.median(list_of_means)) + '\n')
+        mean_lower_bound = np.percentile(list_of_means, 2.5)
+        mean_upper_bound = np.percentile(list_of_means, 97.5)
+        solution_file.write('2.5 percentile mean: ' + str(mean_lower_bound) + '\n')
+        solution_file.write('97.5 percentile mean: ' + str(mean_upper_bound) + '\n')
+
+        solution_file.write('Accepted params: ' + ', '.join(str(item) for item in accepted_params) + '\n')
+    solution_file.write('Eps mean: '  + str((obs_het_stats[0] + 0.005)/eps_het[0]) + 'Eps var: ' + str(obs_het_stats[1]/eps_het[1]) + 'Eps med: ' + str((obs_het_stats[2] + 0.005)/eps_het[2]) + '\n') 
+    
+    solution_file.write('Optimal allele list: ' + ','.join(str(item) for item in opt_allele_sub_list) + '\n')
+    #solution_file.write('Info: ' + '\n'.join(str(item) for item in info) + '\n')
     solution_file.close()
     
 if __name__ == '__main__':

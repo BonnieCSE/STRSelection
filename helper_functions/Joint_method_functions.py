@@ -92,7 +92,7 @@ def GetHetCommon(table):
 # Get distribution of simulated heterozygosity and common allele
 # Look up optimal allele, period, s
 def EstimateParam(ABC_tables, opt_allele_list, shape, scale, obs_het_stats, \
-                  obs_common_stats, model, eps_het, eps_common, use_common_alleles, return_lists=False):
+                  obs_common_stats, model, eps_het, eps_common, use_common_alleles, return_lists=False, return_info=False):
     het_list = []
     common_list = []
     time1 = 0
@@ -204,18 +204,33 @@ def EstimateParam(ABC_tables, opt_allele_list, shape, scale, obs_het_stats, \
         else:
             return False, time1, time2
         '''
-        
-        if abs(obs_het_stats[0] - sim_mean_het) < (obs_het_stats[0] + 0.005)/eps_het[0] and abs(obs_het_stats[1] - sim_var_het) < (obs_het_stats[1])/eps_het[1] and abs(obs_het_stats[2] - sim_med_het) < (obs_het_stats[2]+0.005)/eps_het[2]:
-            if use_common_alleles == False:
-                return True, time1, time2
-            if abs(obs_common_stats[0] - sim_mean_common) < (obs_common_stats[0])/eps_common[0] and abs(obs_common_stats[1] - sim_var_common) < (obs_common_stats[1])/eps_common[1] and abs(obs_common_stats[2] - sim_med_common) < (obs_het_stats[2])/eps_common[2]:
-                return True, time1, time2
+        if return_info == False:
+            if abs(obs_het_stats[0] - sim_mean_het) < (obs_het_stats[0] + 0.005)/eps_het[0] and abs(obs_het_stats[1] - sim_var_het) < (obs_het_stats[1])/eps_het[1] and abs(obs_het_stats[2] - sim_med_het) < (obs_het_stats[2]+0.005)/eps_het[2]:
+                if use_common_alleles == False:
+                    return True, time1, time2
+                if abs(obs_common_stats[0] - sim_mean_common) < (obs_common_stats[0])/eps_common[0] and abs(obs_common_stats[1] - sim_var_common) < (obs_common_stats[1])/eps_common[1] and abs(obs_common_stats[2] - sim_med_common) < (obs_het_stats[2])/eps_common[2]:
+                    return True, time1, time2
+                else:
+                    return False, time1, time2
             else:
                 return False, time1, time2
+        
         else:
-            return False, time1, time2
-        
-        
+            params_accept = [1,1,1,1,1,1]
+            count_0 = 0
+            if abs(obs_het_stats[0] - sim_mean_het) < (obs_het_stats[0] + 0.005)/eps_het[0]:
+                params_accept[0] = 0
+                count_0 = count_0 + 1
+            if abs(obs_het_stats[1] - sim_var_het) < obs_het_stats[1]/eps_het[1]:
+                params_accept[1] = 0
+                count_0 = count_0 + 1
+            if abs(obs_het_stats[2] - sim_med_het) < (obs_het_stats[2] + 0.005)/eps_het[2]:
+                params_accept[2] = 0
+                count_0 = count_0 + 1
+            if count_0 >= 2:
+                return True, sim_mean_het, sim_var_het, sim_med_het, params_accept[0], params_accept[1], params_accept[2]
+            else:
+                return False, sim_mean_het, sim_var_het, sim_med_het, params_accept[0], params_accept[1], params_accept[2]
         '''
         params_accept = [1,1,1,1,1,1]
         if abs(obs_het_stats[0] - sim_mean_het) < (obs_het_stats[0]+0.005)/eps_het[0]:
