@@ -12,10 +12,11 @@ def main():
     numfile = sys.argv[3]
     s_vals = sys.argv[4]
     LRT_num_sims = int(sys.argv[5])
+    use_var_gens = int(sys.argv[6])
     s_list = [float(s) for s in s_vals.split(',')]
-    outFolder1 = '20k_0810/'
-    outFolder2 = '50k_0810/'
-    outFolder3 = 'eurodem_0810/'
+    outFolder1 = '20k_0825/'
+    outFolder2 = '50k_0825/'
+    outFolder3 = 'eurodem_0825/'
     outFile1 = '/projects/ps-gymreklab/bonnieh/lrt/results/' + outFolder1 + str(per) + '_' + str(opt_allele) + '_' + str(numfile) 
     outFile2 = '/projects/ps-gymreklab/bonnieh/lrt/results/' + outFolder2 + str(per) + '_' + str(opt_allele) + '_' + str(numfile) 
     outFile3 = '/projects/ps-gymreklab/bonnieh/lrt/results/' + outFolder3 + str(per) + '_' + str(opt_allele) + '_' + str(numfile) 
@@ -34,6 +35,7 @@ def main():
     outFile3b = outFile3 + '_common.txt'
     outFile3c = outFile3 + '_bins.txt'
     outFile3d = outFile3 + '_freqs.txt'
+    outFile3e = outFile3 + '_gens.txt'
     
     results1a = open(outFile1a, "w")
     results1b = open(outFile1b, "w")
@@ -49,6 +51,7 @@ def main():
     results3b = open(outFile3b, "w")
     results3c = open(outFile3c, "w")
     results3d = open(outFile3d, "w")
+    results3e = open(outFile3e, "w")
     
     results_list = []
     results_list.append(results1a)
@@ -65,6 +68,7 @@ def main():
     results_list.append(results3b)
     results_list.append(results3c)
     results_list.append(results3d)
+    results_list.append(results3e)
     
     # Write results header
     results1a.write("s" + "\t" + "het" +"\n")
@@ -81,6 +85,7 @@ def main():
     results3b.write("s" + "\t" + "common" +"\n")
     results3c.write("s" + "\t" + "bins" +"\n")
     results3d.write("s" + "\t" + "freqs" +"\n")
+    results3e.write("s" + "\t" + "num_gens" +"\n")
     
     # Period info
     period_info = {}
@@ -101,6 +106,18 @@ def main():
     max_iter = 55920
     end_samp_n = 6500
     
+    # Get list of TMRCA values
+    TMRCAFile = '/projects/ps-gymreklab/bonnieh/TMRCA.txt'
+    TMRCA_file = open(TMRCAFile, 'r')
+    TMRCA_list = []
+    for line in TMRCA_file:
+        
+        TMRCA = line.strip()
+        TMRCA = float(TMRCA)
+        TMRCA = int(TMRCA)
+        if TMRCA > 5920:
+            TMRCA_list.append(TMRCA)
+    
     log_mu_prime = np.log10(period_info[per][0])+period_info[per][3]*(opt_allele - period_info[per][4])
     mu_prime = 10**log_mu_prime
     if mu_prime < 10**-8: mu_prime = 10**-8
@@ -110,13 +127,16 @@ def main():
     beta = period_info[per][1]
     p = period_info[per][2]
     L = period_info[per][3]
-    
+    index = -1
     for s in s_list:
         for result_file in results_list:
             result_file.write(str(s) + "\t")
         
         for i in range(0, LRT_num_sims):
-            
+            index = index + 1
+            if use_var_gens == 0:
+                max_iter = TMRCA_list(index)
+                
             # Simulate allele frequencies
             allele_freqs_20k, allele_freqs_50k, allele_freqs_euro = Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n)
 
@@ -147,6 +167,7 @@ def main():
             results3b.write(str(common_euro))
             results3c.write(','.join(str(item) for item in bins_euro))
             results3d.write(','.join(str(item) for item in allele_freqs_euro))
+            results3e.write(str(max_iter))
             
             if i == LRT_num_sims - 1:
                 for result_file in results_list:

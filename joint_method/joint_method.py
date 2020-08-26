@@ -36,6 +36,7 @@ def main():
         use_common_alleles = False
         
     num_loci = int(sys.argv[14])
+    opt_allele_to_validate = int(sys.argv[15])
     
     num_bins = 0
     
@@ -43,7 +44,7 @@ def main():
     filename = PLOTDIR + 'results/'
     
     filename = filename + outFolder + '/'
-    solution_file = open(filename + 'per_%d_%d_%s_sims_%d_het_eps_%d_%d_%d_comm_eps_%d_%d_%d_num_loci_%d.txt'%(period, column, motif_to_use, num_sims, eps_mean_het, eps_var_het, eps_med_het, eps_mean_common, eps_var_common, eps_med_common, num_loci), 'w') 
+    solution_file = open(filename + 'per_%d_%d_%s_sims_%d_het_eps_%d_%d_%d_comm_eps_%d_%d_%d_num_loci_%d_opt_%d.txt'%(period, column, motif_to_use, num_sims, eps_mean_het, eps_var_het, eps_med_het, eps_mean_common, eps_var_common, eps_med_common, num_loci, opt_allele_to_validate), 'w') 
     
     solution_file.write("Num sims: " + str(num_sims) + '\n')
     
@@ -87,11 +88,12 @@ def main():
         motif = info[column]
         
         if per == period:
-            
-            if motif not in motif_dic:
-                motif_dic[motif] = 1
-            else:
-                motif_dic[motif] = motif_dic[motif] + 1
+            opt_allele = Process_Freqs(freqs, per, end, start, False)
+            if opt_allele_to_validate == 0 or opt_allele_to_validate == opt_allele:
+                if motif not in motif_dic:
+                    motif_dic[motif] = 1
+                else:
+                    motif_dic[motif] = motif_dic[motif] + 1
               
     allele_freqs_file.close()
     print(motif_dic)
@@ -115,11 +117,12 @@ def main():
         per = int(info[5])
         
         motif = info[column]
-            
-        if motif == motif_to_use and per == period:
+        opt_allele, allele_freqs = Process_Freqs(freqs, per, end, start)
+        
+        if motif == motif_to_use and per == period and (opt_allele_to_validate == 0 or opt_allele_to_validate == opt_allele):
             count = count + 1
             
-            opt_allele, allele_freqs = Process_Freqs(freqs, per, end, start)
+            
             obs_het = 1-sum([item**2 for item in allele_freqs])
             obs_common = len([i for i in allele_freqs if i >= 0.05])
             obs_het_distr_all.append(obs_het)
@@ -167,7 +170,7 @@ def main():
     eps_common = [eps_mean_common, eps_var_common, eps_med_common]
         
     solution_file.write('Number of loci used: ' + str(len(obs_het_distr)) + '\n')
-    solution_file.write('Column: ' + str(column) +  ' "Motif" of column: ' + motif_to_use + '\n')
+    solution_file.write('Column: ' + str(column) +  ' "Motif" of column: ' + motif_to_use + ' Optimal allele: ' + str(opt_allele_to_validate) + '\n')
     solution_file.write('Mean of observed heterozygosity: ' + str(obs_mean_het) + '\n')
     solution_file.write('Variance of observed heterozygosity: ' + str(obs_var_het) + '\n')
     solution_file.write('Median of observed heterozygosity: ' + str(obs_med_het) + '\n')
@@ -188,13 +191,13 @@ def main():
         mean = np.random.lognormal(mu, sigma)
         theta = mean/k
         t1 = time.time()
-        toAdd, time1, time2 = EstimateParam(ABC_tables, \
+        toAdd, mean_fit, var_fit, med_fit, sim_mean_het, sim_var_het, sim_med_het = EstimateParam(ABC_tables, \
                                        opt_allele_sub_list, k, theta, obs_het_stats, obs_common_stats, model, \
-                                       eps_het, eps_common, use_common_alleles)
+                                       eps_het, eps_common, use_common_alleles, False, True)
         t2 = time.time()
         all_time = all_time + t2-t1
         
-        #info.append((mean_fit, var_fit, med_fit, sim_mean_het, sim_var_het, sim_med_het))
+        info.append((mean_fit, var_fit, med_fit, sim_mean_het, sim_var_het, sim_med_het))
         if toAdd == True:
             accepted_params.append((k, theta))
             
@@ -218,10 +221,10 @@ def main():
         solution_file.write('97.5 percentile mean: ' + str(mean_upper_bound) + '\n')
 
         solution_file.write('Accepted params: ' + ', '.join(str(item) for item in accepted_params) + '\n')
-    solution_file.write('Eps mean: '  + str((obs_het_stats[0] + 0.005)/eps_het[0]) + 'Eps var: ' + str(obs_het_stats[1]/eps_het[1]) + 'Eps med: ' + str((obs_het_stats[2] + 0.005)/eps_het[2]) + '\n') 
+    solution_file.write('Eps mean: '  + str((obs_het_stats[0] + 0.05)/eps_het[0]) + 'Eps var: ' + str((obs_het_stats[1] + 0.05)/eps_het[1]) + 'Eps med: ' + str((obs_het_stats[2] + 0.05)/eps_het[2]) + '\n') # 0.005
     
     solution_file.write('Optimal allele list: ' + ','.join(str(item) for item in opt_allele_sub_list) + '\n')
-    #solution_file.write('Info: ' + '\n'.join(str(item) for item in info) + '\n')
+    solution_file.write('Info: ' + '\n'.join(str(item) for item in info) + '\n')
     solution_file.close()
     
 if __name__ == '__main__':

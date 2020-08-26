@@ -64,6 +64,7 @@ def main():
     lower_0 = 0 # Total lines where lower bound is 0
     s_acc = [] # List of percent of s accepted
      
+    # Preprocess ABC lookup table
     # Perform ABC on each locus
     for line in allele_freqs_file:
         # Get information from line

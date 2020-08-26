@@ -14,6 +14,7 @@ def main():
     theta = float(sys.argv[5])
     filenum = sys.argv[6]
     outFolder = sys.argv[7]
+    use_var_gens = int(sys.argv[8])
     outFile1 = '/projects/ps-gymreklab/bonnieh/abc/results/20k_' + outFolder + '/' + str(per) + '_' + str(opt_allele) + '_' + str(filenum) + '.txt'
     outFile2 = '/projects/ps-gymreklab/bonnieh/abc/results/50k_' + outFolder + '/' + str(per) + '_' + str(opt_allele) + '_' + str(filenum) + '.txt'
     outFile3 = '/projects/ps-gymreklab/bonnieh/abc/results/eurodem_' + outFolder + '/' + str(per) + '_' + str(opt_allele) + '_' + str(filenum) + '.txt'
@@ -22,9 +23,9 @@ def main():
     results3 = open(outFile3, "w")
     
     # Write results header
-    results1.write("s" + "\t" + "het" + "\t" + "common" +"\t" + "bins" + "\t" + "freqs" + "\n")
-    results2.write("s" + "\t" + "het" + "\t" + "common" +"\t" + "bins" + "\t" + "freqs" + "\n")
-    results3.write("s" + "\t" + "het" + "\t" + "common" +"\t" + "bins" + "\t" + "freqs" + "\n")
+    results1.write("s" + "\t" + "het" + "\t" + "common" +"\t" + "bins" + "\t" + "freqs" + "\t" + "gens" + "\n")
+    results2.write("s" + "\t" + "het" + "\t" + "common" +"\t" + "bins" + "\t" + "freqs" + "\t" + "gens" + "\n")
+    results3.write("s" + "\t" + "het" + "\t" + "common" +"\t" + "bins" + "\t" + "freqs" + "\t" + "gens" + "\n")
 
     # Period info
     period_info = {}
@@ -45,6 +46,18 @@ def main():
     max_iter = 55920
     end_samp_n = 6500
     
+    # Get list of TMRCA values
+    TMRCAFile = '/projects/ps-gymreklab/bonnieh/TMRCA.txt'
+    TMRCA_file = open(TMRCAFile, 'r')
+    TMRCA_list = []
+    for line in allele_freqs_file:
+        
+        TMRCA = line.strip()
+        TMRCA = float(TMRCA)
+        TMRCA = int(TMRCA)
+        if TMRCA > 5920:
+            TMRCA_list.append(TMRCA)
+    
     log_mu_prime = np.log10(period_info[per][0])+period_info[per][3]*(opt_allele - period_info[per][4])
     mu_prime = 10**log_mu_prime
     if mu_prime < 10**-8: mu_prime = 10**-8 
@@ -54,7 +67,8 @@ def main():
     beta = period_info[per][1]
     p_param = period_info[per][2]
     L = period_info[per][3]
-
+    
+    index = -1
     for i in range(0, ABC_num_sims):
 
         # Draw s from prior
@@ -66,7 +80,11 @@ def main():
             s = np.random.uniform()
         if s > 1:
             s = 1
-
+            
+        index = index + 1
+        if use_var_gens == 0:
+            max_iter = TMRCA_list(index)
+            
         # Simulate allele frequencies
         allele_freqs_20k, allele_freqs_50k, allele_freqs_euro = Simulate(number_alleles, n_effec, mu, beta, p_param, L, s, max_iter, end_samp_n)
 
@@ -84,11 +102,11 @@ def main():
         bins_euro = GetBins(allele_freqs_euro, 5)
             
         # Write summary statistics and allele frequencies to file
-        results1.write(str(s) + "\t" + str(het_20k) + "\t" + str(common_20k) + "\t" + ','.join(str(item) for item in bins_20k) + "\t" + ','.join(str(item) for item in allele_freqs_20k) + "\n")
+        results1.write(str(s) + "\t" + str(het_20k) + "\t" + str(common_20k) + "\t" + ','.join(str(item) for item in bins_20k) + "\t" + ','.join(str(item) for item in allele_freqs_20k) + "\t" + str(max_iter) + "\n")
 
-        results2.write(str(s) + "\t" + str(het_50k) + "\t" + str(common_50k) + "\t" + ','.join(str(item) for item in bins_50k) + "\t" + ','.join(str(item) for item in allele_freqs_50k) + "\n")
+        results2.write(str(s) + "\t" + str(het_50k) + "\t" + str(common_50k) + "\t" + ','.join(str(item) for item in bins_50k) + "\t" + ','.join(str(item) for item in allele_freqs_50k) + "\t" + str(max_iter) + "\n")
         
-        results3.write(str(s) + "\t" + str(het_euro) + "\t" + str(common_euro) + "\t" + ','.join(str(item) for item in bins_euro) + "\t" + ','.join(str(item) for item in allele_freqs_euro) + "\n")
+        results3.write(str(s) + "\t" + str(het_euro) + "\t" + str(common_euro) + "\t" + ','.join(str(item) for item in bins_euro) + "\t" + ','.join(str(item) for item in allele_freqs_euro) + "\t" + str(max_iter) + "\n")
         
     results1.close()
     results2.close()
