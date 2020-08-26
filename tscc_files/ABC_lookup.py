@@ -12,7 +12,7 @@ def main():
     ABC_num_sims = int(sys.argv[3])
     k = float(sys.argv[4])
     theta = float(sys.argv[5])
-    filenum = sys.argv[6]
+    filenum = int(sys.argv[6])
     outFolder = sys.argv[7]
     use_var_gens = int(sys.argv[8])
     outFile1 = '/projects/ps-gymreklab/bonnieh/abc/results/20k_' + outFolder + '/' + str(per) + '_' + str(opt_allele) + '_' + str(filenum) + '.txt'
@@ -50,7 +50,7 @@ def main():
     TMRCAFile = '/projects/ps-gymreklab/bonnieh/TMRCA.txt'
     TMRCA_file = open(TMRCAFile, 'r')
     TMRCA_list = []
-    for line in allele_freqs_file:
+    for line in TMRCA_file:
         
         TMRCA = line.strip()
         TMRCA = float(TMRCA)
@@ -68,7 +68,7 @@ def main():
     p_param = period_info[per][2]
     L = period_info[per][3]
     
-    index = -1
+    index = -1 + filenum*ABC_num_sims
     for i in range(0, ABC_num_sims):
 
         # Draw s from prior
@@ -83,7 +83,7 @@ def main():
             
         index = index + 1
         if use_var_gens == 0:
-            max_iter = TMRCA_list(index)
+            max_iter = TMRCA_list[index]
             
         # Simulate allele frequencies
         allele_freqs_20k, allele_freqs_50k, allele_freqs_euro = Simulate(number_alleles, n_effec, mu, beta, p_param, L, s, max_iter, end_samp_n)

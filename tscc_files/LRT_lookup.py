@@ -9,7 +9,7 @@ def main():
     # Load parameters
     per = int(sys.argv[1])
     opt_allele = int(sys.argv[2])
-    numfile = sys.argv[3]
+    numfile = int(sys.argv[3])
     s_vals = sys.argv[4]
     LRT_num_sims = int(sys.argv[5])
     use_var_gens = int(sys.argv[6])
@@ -127,7 +127,7 @@ def main():
     beta = period_info[per][1]
     p = period_info[per][2]
     L = period_info[per][3]
-    index = -1
+    index = -1 + numfile*len(s_list)*LRT_num_sims
     for s in s_list:
         for result_file in results_list:
             result_file.write(str(s) + "\t")
@@ -135,7 +135,7 @@ def main():
         for i in range(0, LRT_num_sims):
             index = index + 1
             if use_var_gens == 0:
-                max_iter = TMRCA_list(index)
+                max_iter = TMRCA_list[index]
                 
             # Simulate allele frequencies
             allele_freqs_20k, allele_freqs_50k, allele_freqs_euro = Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n)

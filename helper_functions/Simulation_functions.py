@@ -196,10 +196,10 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
 
     het_list = []
     var_list = []
-    
+    allele_freqs_20k = np.zeros(num_alleles)
+    allele_freqs_50k = np.zeros(num_alleles)
     while t < max_iter:
-        allele_freqs_20k = [0.2,0.2,0.2,0.2,0.2]
-        allele_freqs_50k = [0.2,0.2,0.2,0.2,0.2]
+        
         if return_stats == True and t % 100 == 0 and t < max_iter - 5920:
             het = 1-sum([item**2 for item in allele_freqs])
             het_list.append(het)
