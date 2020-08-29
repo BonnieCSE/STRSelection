@@ -12,6 +12,7 @@ generate*.ipynb
 graph_het_distr.ipynb
 graph_pdf.ipynb
 graph_pdf_discrete.ipynb
+plot_cdf_real_data_by_opt_allele_backup.ipynb
 plot_het_real_data.ipynb
 plot_het_sim_data.ipynb
 plot_prior.ipynb

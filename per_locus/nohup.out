@@ -18,3 +18,23 @@
 0inputs+39912outputs (0major+121949066minor)pagefaults 0swaps
 34323.89user 1241.81system 12:29:36elapsed 79%CPU (0avgtext+0avgdata 90312maxresident)k
 0inputs+38568outputs (0major+135746221minor)pagefaults 0swaps
+Traceback (most recent call last):
+  File "/storage/BonnieH/selection_project/per_locus/SISTR_fast.py", line 301, in <module>
+    main()
+  File "/storage/BonnieH/selection_project/per_locus/SISTR_fast.py", line 49, in main
+    allele_freqs_file = open(inFile, 'r')
+FileNotFoundError: [Errno 2] No such file or directory: '/storage/BonnieH/selection_project/ssc_files/0810/allele_freqs_filt_fast.txt'
+0.66user 0.07system 0:00.76elapsed 96%CPU (0avgtext+0avgdata 68480maxresident)k
+48inputs+8outputs (1major+18059minor)pagefaults 0swaps
+14098.02user 1001.19system 4:41:08elapsed 89%CPU (0avgtext+0avgdata 189200maxresident)k
+1478792inputs+34432outputs (418major+127685715minor)pagefaults 0swaps
+14116.44user 897.88system 4:39:56elapsed 89%CPU (0avgtext+0avgdata 189292maxresident)k
+1345040inputs+34240outputs (166major+76917010minor)pagefaults 0swaps
+14287.60user 1007.11system 4:44:53elapsed 89%CPU (0avgtext+0avgdata 170400maxresident)k
+966464inputs+32760outputs (260major+97248883minor)pagefaults 0swaps
+14323.09user 1023.16system 4:45:08elapsed 89%CPU (0avgtext+0avgdata 188984maxresident)k
+1304320inputs+34720outputs (137major+104298890minor)pagefaults 0swaps
+14400.86user 1002.69system 4:46:28elapsed 89%CPU (0avgtext+0avgdata 170736maxresident)k
+1324392inputs+33224outputs (145major+100441652minor)pagefaults 0swaps
+14354.84user 1056.95system 4:46:38elapsed 89%CPU (0avgtext+0avgdata 170332maxresident)k
+1242888inputs+33048outputs (91major+126008487minor)pagefaults 0swaps

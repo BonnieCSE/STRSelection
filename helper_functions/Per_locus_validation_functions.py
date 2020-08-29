@@ -8,7 +8,7 @@ from scipy import stats
 ########## Per-locus Validation Functions ##########
 
 def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
-                       num_bins, abc_model, lrt_model, all_pers=False, first_200=True, trials_2000=False, LRT_200=False):
+                       num_bins, abc_model, lrt_model, ground_truth_model, all_pers=False, first_200=True, trials_2000=False, LRT_200=False):
     
     # Process list of optimal alleles
     opt_allele_list = list(opt_allele.split(','))
@@ -86,6 +86,7 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
         obs_comm_dic_lrt = {}
         obs_bins_dic_lrt = {}
     
+        lrtFile_ground_truth = '/gymreklab-tscc/bonnieh/lrt/results/' + ground_truth_model + '/' + str(per) + '_' + str(opt_allele) + '_freqs.txt'
         # Fill in dictionaries of summary statistics
         for s in s_vals:
             
@@ -93,11 +94,11 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
             obs_comm_dic[s] = []
             obs_bins_dic[s] = []
             
-            freqs_list_raw = GetLRTListFreq200(lrtFile, s) # Get list of allele frequencies for this s
+            freqs_list_raw = GetLRTListFreq200(lrtFile_ground_truth, s) # Get list of allele frequencies for this s
             if first_200 == False:
-                freqs_list_raw = GetLRTListFreq200(lrtFile, s, False)
+                freqs_list_raw = GetLRTListFreq200(lrtFile_ground_truth, s, False)
             if trials_2000 == True:
-                freqs_list_raw = GetLRTListFreq(lrtFile, s)
+                freqs_list_raw = GetLRTListFreq(lrtFile_ground_truth, s)
             # Get summary statistics from frequencies
             for freq_string in freqs_list_raw:
                 

@@ -42,9 +42,12 @@ def main():
     
     # Naming file
     filename = PLOTDIR + 'results/'
+    opt_allele_string = str(opt_allele_to_validate)
     
+    if opt_allele_to_validate < 10:
+        opt_allele_string = '0' + opt_allele_string
     filename = filename + outFolder + '/'
-    solution_file = open(filename + 'per_%d_%d_%s_sims_%d_het_eps_%d_%d_%d_comm_eps_%d_%d_%d_num_loci_%d_opt_%d.txt'%(period, column, motif_to_use, num_sims, eps_mean_het, eps_var_het, eps_med_het, eps_mean_common, eps_var_common, eps_med_common, num_loci, opt_allele_to_validate), 'w') 
+    solution_file = open(filename + 'per_%d_%d_%s_sims_%d_het_eps_%d_%d_%d_comm_eps_%d_%d_%d_num_loci_%d_opt_%s.txt'%(period, column, motif_to_use, num_sims, eps_mean_het, eps_var_het, eps_med_het, eps_mean_common, eps_var_common, eps_med_common, num_loci, opt_allele_string), 'w') 
     
     solution_file.write("Num sims: " + str(num_sims) + '\n')
     

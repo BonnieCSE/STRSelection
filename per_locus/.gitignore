@@ -3,6 +3,8 @@ final_results/
 SISTR_results/
 SISTR_results_backup/
 SISTR_results_processed/
+SISTR_results_0825/
+SISTR_results_processed_0825/
 ABC_script.py
 LRT_script.py
 commands_ABC.txt
