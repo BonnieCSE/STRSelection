@@ -1,4 +1,4 @@
-# Script to run ABC for all-locus/joint method 
+# Script to run ABC for all-locus/joint method on real data
 
 ### Imports ###
 

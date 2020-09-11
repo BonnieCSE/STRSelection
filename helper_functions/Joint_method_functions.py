@@ -4,8 +4,8 @@ import time
 import statistics
 ########## Joint Method Helper Functions ##########
 
-def GetGammaBins(k, theta):
-    num_sims = 10000
+def GetGammaBins(k, theta, num_sims, return_median=False):
+    #num_sims = 100
     s = [] # List of s values drawn from gamma distribution
     for i in range(0, num_sims):
         s_val = np.random.gamma(k, theta)
@@ -29,8 +29,10 @@ def GetGammaBins(k, theta):
     total = sum(svals)
     for i in range(0, len(svals)):
         svals[i] = svals[i]/total
-        
-    return svals
+    if return_median == False:
+        return svals
+    else:
+        return s, np.median(s), np.mean(s)
 
     
 

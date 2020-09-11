@@ -1,6 +1,7 @@
 results/
 figures/
 old/
+*Extra.ipynb
 joint_method_validation_mult.py
 joint_method_validation_mult_one_opt_allele.py
 joint_method_validation_one_opt.py
@@ -16,7 +17,7 @@ plot_cdf_real_data_by_opt_allele_backup.ipynb
 plot_het_real_data.ipynb
 plot_het_sim_data.ipynb
 plot_prior.ipynb
-test.ipynb
+test*
 joint_method-Copy1.py
 commands.txt
 nohup.out
