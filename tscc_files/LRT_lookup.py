@@ -1,12 +1,15 @@
-# Generate LRT lookup table on TSCC
+# Script to generate LRT lookup table on TSCC
 
+# Imports
 import sys 
 sys.path.append("/projects/ps-gymreklab/bonnieh/helper_functions")
 from Simulation_functions import *
 from ABC_functions import *
 
+# Main function
 def main():    
-    # Load parameters
+    
+    # Load parameters from command line, see README.md for argument explanations
     per = int(sys.argv[1])
     opt_allele = int(sys.argv[2])
     numfile = int(sys.argv[3])
@@ -14,6 +17,8 @@ def main():
     LRT_num_sims = int(sys.argv[5])
     use_var_gens = int(sys.argv[6])
     s_list = [float(s) for s in s_vals.split(',')]
+    
+    # Name and open output files
     outFolder1 = '20k_0825/'
     outFolder2 = '50k_0825/'
     outFolder3 = 'eurodem_0825/'
@@ -87,7 +92,7 @@ def main():
     results3d.write("s" + "\t" + "freqs" +"\n")
     results3e.write("s" + "\t" + "num_gens" +"\n")
     
-    # Period info
+    # Mutation model parameters
     period_info = {}
 
     L1_log = 0.04
@@ -95,7 +100,7 @@ def main():
     L3_log = 0.33
     L4_log = 0.45 
 
-    # mu, beta, p, l
+    # List contents: mu, beta, p, l, optimal ru for the mu value
     period_info[1] = [10**-4.2, 0.5, 1, L1_log, 13]
     period_info[2] = [10**-5, 0.3, 0.6, L2_log, 6]
     period_info[3] = [10**-5.5, 0.3, 0.9, L3_log, 5] 
@@ -106,18 +111,18 @@ def main():
     max_iter = 55920
     end_samp_n = 6500
     
-    # Get list of TMRCA values
+    # Get list of TMRCA values and put in TMRCA_list
     TMRCAFile = '/projects/ps-gymreklab/bonnieh/TMRCA.txt'
     TMRCA_file = open(TMRCAFile, 'r')
     TMRCA_list = []
     for line in TMRCA_file:
-        
         TMRCA = line.strip()
         TMRCA = float(TMRCA)
         TMRCA = int(TMRCA)
         if TMRCA > 5920:
             TMRCA_list.append(TMRCA)
     
+    # Get mutation model parameters based on STR class inputted on command line
     log_mu_prime = np.log10(period_info[per][0])+period_info[per][3]*(opt_allele - period_info[per][4])
     mu_prime = 10**log_mu_prime
     if mu_prime < 10**-8: mu_prime = 10**-8
@@ -127,7 +132,11 @@ def main():
     beta = period_info[per][1]
     p = period_info[per][2]
     L = period_info[per][3]
+    
+    # Index from which to obtain TMRCA values
     index = -1 + numfile*len(s_list)*LRT_num_sims
+    
+    # Run ABC_num_sims number of simulations for each s value
     for s in s_list:
         for result_file in results_list:
             result_file.write(str(s) + "\t")
@@ -140,7 +149,7 @@ def main():
             # Simulate allele frequencies
             allele_freqs_20k, allele_freqs_50k, allele_freqs_euro = Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n)
 
-            # Compute summary statistic of simulated allele frequencies
+            # Compute summary statistics of simulated allele frequencies
             het_20k = 1-sum([item**2 for item in allele_freqs_20k])
             het_50k = 1-sum([item**2 for item in allele_freqs_50k])
             het_euro = 1-sum([item**2 for item in allele_freqs_euro]) 
@@ -153,6 +162,7 @@ def main():
             bins_50k = GetBins(allele_freqs_50k, 5)
             bins_euro = GetBins(allele_freqs_euro, 5)
             
+            # Write summary statistics and allele frequencies to file
             results1a.write(str(het_20k))
             results1b.write(str(common_20k))
             results1c.write(','.join(str(item) for item in bins_20k))

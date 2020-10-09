@@ -194,13 +194,13 @@ def main():
         mean = np.random.lognormal(mu, sigma)
         theta = mean/k
         t1 = time.time()
-        toAdd, mean_fit, var_fit, med_fit, sim_mean_het, sim_var_het, sim_med_het = EstimateParam(ABC_tables, \
+        toAdd, mean_fit, var_fit, med_fit, a,b,c,sim_mean_het, sim_var_het, sim_med_het,d,e,f = EstimateParam(ABC_tables, \
                                        opt_allele_sub_list, k, theta, obs_het_stats, obs_common_stats, model, \
                                        eps_het, eps_common, use_common_alleles, False, True)
         t2 = time.time()
         all_time = all_time + t2-t1
         
-        info.append((mean_fit, var_fit, med_fit, sim_mean_het, sim_var_het, sim_med_het))
+        info.append((mean_fit, var_fit, med_fit, a,b,c,sim_mean_het, sim_var_het, sim_med_het,d,e,f))
         if toAdd == True:
             accepted_params.append((k, theta))
             
@@ -224,7 +224,7 @@ def main():
         solution_file.write('97.5 percentile mean: ' + str(mean_upper_bound) + '\n')
 
         solution_file.write('Accepted params: ' + ', '.join(str(item) for item in accepted_params) + '\n')
-    solution_file.write('Eps mean: '  + str((obs_het_stats[0] + 0.05)/eps_het[0]) + 'Eps var: ' + str((obs_het_stats[1] + 0.05)/eps_het[1]) + 'Eps med: ' + str((obs_het_stats[2] + 0.05)/eps_het[2]) + '\n') # 0.005
+    solution_file.write('Eps mean: '  + str((obs_het_stats[0] + 0.005)/eps_het[0]) + 'Eps var: ' + str((obs_het_stats[1] + 0.005)/eps_het[1]) + 'Eps med: ' + str((obs_het_stats[2] + 0.005)/eps_het[2]) + '\n') # 0.005
     
     solution_file.write('Optimal allele list: ' + ','.join(str(item) for item in opt_allele_sub_list) + '\n')
     solution_file.write('Info: ' + '\n'.join(str(item) for item in info) + '\n')

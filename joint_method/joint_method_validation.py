@@ -129,13 +129,13 @@ def main():
             mean = np.random.lognormal(mu, sigma)
             theta = mean/k
             t1 = time.time()
-            toAdd, time1, time2 = EstimateParam(ABC_tables, opt_allele_sub_list, k, theta, obs_het_stats, \
-                                  obs_common_stats, model, eps_het, eps_common, use_common_alleles)
-            t2 = time.time()
-            all_time = all_time + t2-t1
+            toAdd, mean_fit, var_fit, med_fit, a,b,c,sim_mean_het, sim_var_het, sim_med_het,d,e,f = EstimateParam(ABC_tables, opt_allele_sub_list, k, theta, obs_het_stats, \
+                                  obs_common_stats, model, eps_het, eps_common, use_common_alleles, False, True)
+            #t2 = time.time()
+            #all_time = all_time + t2-t1
             #print(toAdd)
-            total_time_1  = total_time_1 + time1
-            total_time_2 = total_time_2 + time2
+            #total_time_1  = total_time_1 + time1
+            #total_time_2 = total_time_2 + time2
             if toAdd == True:
                 accepted_params.append((k, theta))
 
@@ -158,7 +158,7 @@ def main():
         
     mean_of_medians = np.mean(list_of_medians)
     stdev = np.std(list_of_medians)
-    solution_file.write('Mean, median of number of accepted pairs: ' + str(np.mean(num_accepted_pairs)) + ',' + str(np.median(num_accepted_pairs)) + '\n')
+    solution_file.write('Mean, median of number of accepted pairs: ' + str(np.mean(num_accepted_pairs)) + ',' + str(np.median(num_accepted_pairs)) + ' Num accepted out of num trials: ' + str(len(list_of_medians)) + '\n')
     solution_file.write('Mean of medians: ' + str(mean_of_medians) + '\n')
     solution_file.write('Standard deviation: ' + str(stdev) + '\n')
         
