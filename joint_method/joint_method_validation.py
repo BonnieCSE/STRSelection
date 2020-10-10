@@ -11,6 +11,7 @@ import statistics
 
 def main():
     
+    # Read in command line arguments
     period = int(sys.argv[1]) # Which period to jointly estimate s on
     model = sys.argv[2] # File from which to obtain s values and summary statistics 
     eps_mean_het = float(sys.argv[3]) # Denominator for epsilon for mean of het distr
@@ -28,10 +29,6 @@ def main():
     else:
         use_common_alleles = False
         
-    
-    #perform_validation = int(sys.argv[15]) # Whether to perform validation (0 for true)
-    #if perform_validation == 0:
-        #perform_validation = True
     k_val = float(sys.argv[13])
     theta_val = float(sys.argv[14])
     validation_mean = float(sys.argv[15])
@@ -63,20 +60,22 @@ def main():
     opt_allele_dic[2] = [11,12,13,14,15,16,17,18,19,20]
     opt_allele_dic[4] = [7,8,9,10]
     
-    opt_allele_dic_w_per = {}
-    opt_allele_dic_w_per[3] = [(3,5),(3,6),(3,7),(3,8),(3,9),(3,10),(3,11),(3,12),(3,13)]
-    opt_allele_dic_w_per[2] = [(2,11),(2,12),(2,13),(2,14),(2,15),(2,16),(2,17),(2,18),(2,19),(2,20)]
-    opt_allele_dic_w_per[4] = [(4,7),(4,8),(4,9),(4,10)]
+    #opt_allele_dic_w_per = {}
+    #opt_allele_dic_w_per[3] = [(3,5),(3,6),(3,7),(3,8),(3,9),(3,10),(3,11),(3,12),(3,13)]
+    #opt_allele_dic_w_per[2] = [(2,11),(2,12),(2,13),(2,14),(2,15),(2,16),(2,17),(2,18),(2,19),(2,20)]
+    #opt_allele_dic_w_per[4] = [(4,7),(4,8),(4,9),(4,10)]
     
     for opt_allele in opt_allele_dic[period]:
         file = '/gymreklab-tscc/bonnieh/abc/results/'+model+'/' + str(period) + '_' + str(opt_allele) + '.txt' 
         table = GetABCList(file, num_bins)
         dic_summ_stats = {}
+        
+        # Fill in dic_summ_stats: Key is s, value is list of het, number of common alleles pairs for given s value
         for combo in table:
             s_round = get_LRT_bin(combo[0])
             if s_round not in dic_summ_stats:
                 dic_summ_stats[s_round] = []
-            dic_summ_stats[s_round].append([combo[1], combo[2]])
+            dic_summ_stats[s_round].append([combo[1], combo[2]]) # Append het, number of common alleles for s value
                                               
         ABC_tables[opt_allele] = dic_summ_stats
         
@@ -87,17 +86,20 @@ def main():
     gt_mean = []
     gt_var = []
     gt_med = []
+    
     # Perform validation
     if opt_allele_to_use == 0:
         opt_allele_sub_list = random.choices(opt_allele_dic_w_per[period], k=num_loci)
     else:
         opt_allele_sub_list = [(period, opt_allele_to_use)] * num_loci
+    
     for i in range(0, num_trials):
         #opt_allele_sub_list = random.sample(opt_allele_list, 1000)
+        # Dummy variables, these lists are filled in later below
         obs_het_stats = [1,1,1]
         obs_common_stats = [1,1,1]
         
-        
+        # Get ground truth heterozygosity and number of common alleles distributions
         het_list, common_list = EstimateParam(ABC_tables, opt_allele_sub_list, k_val, theta_val, obs_het_stats, \
                                               obs_common_stats, model, eps_het, eps_common, use_common_alleles, True) 
         

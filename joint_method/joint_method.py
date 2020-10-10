@@ -137,6 +137,7 @@ def main():
     opt_allele_sub_list = []
     obs_het_distr = []
     obs_common_distr = []
+    total_number_loci = len(opt_allele_list)
     if len(opt_allele_list) <= num_loci:
         opt_allele_sub_list = opt_allele_list
         obs_het_distr = obs_het_distr_all
@@ -172,7 +173,7 @@ def main():
     eps_het = [eps_mean_het, eps_var_het, eps_med_het]
     eps_common = [eps_mean_common, eps_var_common, eps_med_common]
         
-    solution_file.write('Number of loci used: ' + str(len(obs_het_distr)) + '\n')
+    solution_file.write('Number of loci used: ' + str(len(obs_het_distr)) + ' Total number loci: ' + str(total_number_loci) + '\n')
     solution_file.write('Column: ' + str(column) +  ' "Motif" of column: ' + motif_to_use + ' Optimal allele: ' + str(opt_allele_to_validate) + '\n')
     solution_file.write('Mean of observed heterozygosity: ' + str(obs_mean_het) + '\n')
     solution_file.write('Variance of observed heterozygosity: ' + str(obs_var_het) + '\n')
