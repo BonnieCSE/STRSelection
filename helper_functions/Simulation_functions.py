@@ -1,4 +1,5 @@
-# Functions for mutation model, selection model, and simulation algorithm 
+# This file contains helper functions for the SISTR mutation model, selection model, 
+# and simulation algorithm to simulate allele frequencies forward in time.
 
 ########## Imports ##########
 
@@ -9,10 +10,27 @@ from ABC_functions import *
 
 ########## Simulation Helper Functions ##########
 
+"""Get step size probability
+Parameters
+----------
+a1 : int
+    Allele mutating from
+a2: int
+    Allele mutating to
+beta: float 
+    Strength of mutation size directional bias
+p: float
+    Parameterizes the mutation geometric step size distribution
+    
+Returns
+-------
+step_size_prob: float
+    Given that a1 mutates, the porbability that a1 mutates to a2
+"""
 def GetStepSizeProb(a1, a2, beta, p):
     step_size = (a2-a1)
-    up_prob = max([0.01,0.5*(1-beta*p*a1)]) # Minimum value is 0.01
-    up_prob = min(up_prob, 0.99) # Maximum value is 0.99
+    up_prob = max([0.01,0.5*(1-beta*p*a1)]) # Minimum value is 0.01 (allow for minimal probability of expansion at large alleles)
+    up_prob = min(up_prob, 0.99) # Maximum value is 0.99 (allow for minimal probability of contraction at small alleles)
     down_prob = 1-up_prob
     if step_size>0: dir_prob = up_prob
     else: dir_prob = down_prob
@@ -20,15 +38,18 @@ def GetStepSizeProb(a1, a2, beta, p):
     return dir_prob*step_prob
 
 """Build transition matrix 
-
 Parameters
 ----------
 num_alleles : int
     Size of transition matrix to build. Centered at "0" (most optimal allele in the center)
 mu: float
+    Per-generation mutation rate of the central allele
 beta: float 
+    Strength of mutation size directional bias
 p: float
+    Parameterizes the mutation geometric step size distribution
 L: float
+    Length-dependent mutation rate parameter (slope of the increase of mutation rate with allele size)
     
 Returns
 -------
@@ -44,7 +65,7 @@ def GetTransitionMatrix(num_alleles, mu, beta, p, L):
         for j in range(num_alleles):
             a1 = -1*int(num_alleles/2)+i
             a2 = -1*int(num_alleles/2)+j
-            log_mu_prime = np.log10(mu)+L*a1 # Length-dependent mutation rate. TODO should we do a sigmoid curve like Payseur?
+            log_mu_prime = np.log10(mu)+L*a1 # Length-dependent mutation rate
             mu_prime = 10**log_mu_prime
             if mu_prime < 10**-8: mu_prime = 10**-8 
             if mu_prime > 10**-3: mu_prime = 10**-3
@@ -53,11 +74,11 @@ def GetTransitionMatrix(num_alleles, mu, beta, p, L):
                 prob = GetStepSizeProb(a1, a2, beta, p)
                 transition_matrix[i,j] = mu_prime*prob
         
-    # Rescale each row to sum to 1 (which should hopefully be mostly true anyway)
+    # Rescale each row to sum to 1 
     for i in range(num_alleles):
         rowsum = np.sum(transition_matrix[i,:])
         transition_matrix[i,:] = transition_matrix[i,:]/rowsum
-
+        
     return transition_matrix
 
 """Build fitness matrix (fitness of each genotype) 
@@ -157,7 +178,7 @@ L: float
 s: float
     Selection coefficient. 
 max_iter: int
-    Number of generations to perform forward simulations (including the additional 6k generations from incorporating European demographic model)
+    Number of generations to perform forward simulations (including the additional generations from incorporating population-specific demographic models)
 end_samp_n: int
     Sample size for observed allele frequencies for last sampling step
 return_stats: bool
@@ -166,8 +187,10 @@ use_drift: bool
     Whether to perform multinomial sampling step at each generation
 set_start_equal: bool
     Whether to set starting vector of allele frequencies as equal
+dem_model: string
+    Demographic model to use - either 'european' or 'african'
 """
-def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_stats=False, use_drift=True, set_start_equal=False):
+def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_stats=False, use_drift=True, set_start_equal=False, dem_model='european'):
 
     PARAM_is_w_additive = True # Whether the fitness matrix of genotypes is additive or multiplicative
 
@@ -179,7 +202,7 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
         for i in range(num_alleles):
             allele_freqs[i] = 1/num_alleles
 
-    # Set starting vector of allele frequencies: Optimal allele frequency 1
+    # Set starting vector of allele frequencies: Optimal/ancestral allele frequency 1
     if set_start_equal == False:
         allele_freqs[int(num_alleles/2)] = 1
 
@@ -196,8 +219,9 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
 
     het_list = []
     var_list = []
-    allele_freqs_20k = np.zeros(num_alleles)
-    allele_freqs_50k = np.zeros(num_alleles)
+    allele_freqs_20k = np.zeros(num_alleles) # Allele frequencies from 20k generations
+    allele_freqs_50k = np.zeros(num_alleles) # Allele frequencies from 50k generations
+    
     while t < max_iter:
         
         if return_stats == True and t % 100 == 0 and t < max_iter - 5920:
@@ -206,7 +230,7 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
             var = GetVar(allele_freqs)
             var_list.append(var)
             
-        # Get allele frequencies at 20k generations
+        # Get allele frequencies at 20k generations (before incorporating population-specific demographics)
         if t == 20000:
             allele_freqs_20k = copy.deepcopy(allele_freqs)
             if end_samp_n > 0:
@@ -217,7 +241,7 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
 
                 allele_freqs_20k = allele_counts/rowsum
 
-        # Get allele frequencies before incorporating European demographics 
+        # Get allele frequencies at 50k generations (before incorporating population-specific demographics)
         if t == 50000: 
             allele_freqs_50k = copy.deepcopy(allele_freqs)
             if end_samp_n > 0:
@@ -228,22 +252,31 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
 
                 allele_freqs_50k = allele_counts/rowsum
             
-        # European demographic model
-        if t == max_iter - 5920:
-            N_e = 14474
+        # European demographic model for effective population sizes at different points in time
+        if dem_model == 'european':
+            if t == max_iter - 5920:
+                N_e = 14474
+
+            if t == max_iter - 2040:
+                N_e = 1861
+
+            if t == max_iter - 920:
+                N_e = 1032
+
+            if t > max_iter - 920 and t < max_iter - 205:
+                N_e = N_e * 1.00307
+
+            if t >= max_iter - 205:
+                N_e = N_e * 1.0195
         
-        if t == max_iter - 2040:
-            N_e = 1861
+        # African demographic model for effective population sizes at different points in time
+        elif dem_model == 'african':
+            if t == max_iter - 5920:
+                N_e = 14474
             
-        if t == max_iter - 920:
-            N_e = 1032
+            if t >= max_iter - 205:
+                N_e = N_e * 1.0166
         
-        if t > max_iter - 920 and t < max_iter - 205:
-            N_e = N_e * 1.00307
-        
-        if t >= max_iter - 205:
-            N_e = N_e * 1.0195
-            
         # Calculate marginal fitness w*(a[i]) for each allele
         marginal_fitness_vector = GetMarginalFitnessVector(allele_freqs, fitness_matrix)
 

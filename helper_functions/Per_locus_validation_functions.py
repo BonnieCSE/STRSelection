@@ -1,4 +1,4 @@
-# This file contain helper functions for per-locus validation
+# This file contain helper functions for SISTR per-locus validation
 
 ########## Imports ##########
 
@@ -7,8 +7,60 @@ from scipy import stats
 
 ########## Per-locus Validation Functions ##########
 
+"""Validate the per-locus method
+Parameters
+----------
+per : int
+    Period to validate
+opt_allele: string
+    Optimal alleles to validate (separated by commas)
+s_vals: string
+    S values to validate (separated by commas)
+use_het: string
+    Whether to use heterozygosity as a summary statistic
+use_common : string
+    Whether to use number of common alleles as a summary statistic
+use_bins: string
+    Whether to use bins of allele frequencies as a summary statistic
+num_bins: int
+    Number of bins to use when binning allele frequencies
+abc_model: string
+    Prior/demographic model to use for ABC
+lrt_model : string
+    Demographic model to use for LRT
+ground_truth_model: string
+    The ground truth model for simulations
+all_pers: boolean 
+    Whether to validate all periods (2,3,4) or just one
+first_200: boolean
+    Whether to infer s for first 200 allele frequencies in file
+trials_2000: boolean
+    Whether to infer s for 2000 allele frequencies (default: infer s for 200 allele frequencies)
+LRT_200: boolean
+    Whether to perform 200 simulations for the LRT (default: perform 2000 simulations for the LRT)
+    
+Returns
+-------
+opt_allele_list: list
+    List of optimal alleles validated 
+s_vals_dic: dictionary
+    Contains information about inferred s values 
+errors_s_dic: dictionary
+    Contains information about error for inferred s values
+s_vals: list
+    List of s values validated
+p_vals_dic: dictionary
+    Contains information about p values obtained from LRT
+errors_p_dic: dictionary
+    Contains information about error for p values
+eps_bins: float
+    Error threshold for bins summary statistic
+LogLR_vals_dic: dictionary
+    Contains information about LogLR values
+"""
 def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
-                       num_bins, abc_model, lrt_model, ground_truth_model, all_pers=False, first_200=True, trials_2000=False, LRT_200=False):
+                       num_bins, abc_model, lrt_model, ground_truth_model, all_pers=False, \
+                       first_200=True, trials_2000=False, LRT_200=False):
     
     # Process list of optimal alleles
     opt_allele_list = list(opt_allele.split(','))
@@ -26,9 +78,11 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
     eps_bins = 0.3
     
     # LRT parameters
-    LRT_num_sims = 2000 # Change back to 2000!
+    # Default: 2000 sims for LRT
+    LRT_num_sims = 2000 
     if LRT_200 == True:
         LRT_num_sims = 200
+        
     # Each dictionary contains values for all optimal alleles
     # Key: optimal allele
     # Value: list of mean values for each s 
@@ -48,12 +102,16 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
       
     # Run ABC and LRT for each opt_allele
     for opt_allele in opt_allele_list:
+        # If plotting all periods on one graph, assign each optimal allele a period
         if all_pers == True:
             per = 2
+            if opt_allele == 16 or opt_allele == 40:
+                per = 1
             if opt_allele == 5 or opt_allele == 13 or opt_allele == 6 or opt_allele == 12:
                 per = 3
             if opt_allele == 7 or opt_allele == 10 or opt_allele == 8 or opt_allele == 9:
                 per = 4
+                
         LogLR_list = []
         l0_list = []
         ls_list = []
@@ -87,6 +145,7 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
         obs_bins_dic_lrt = {}
     
         lrtFile_ground_truth = '/gymreklab-tscc/bonnieh/lrt/results/' + ground_truth_model + '/' + str(per) + '_' + str(opt_allele) + '_freqs.txt'
+        
         # Fill in dictionaries of summary statistics
         for s in s_vals:
             
@@ -94,11 +153,14 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
             obs_comm_dic[s] = []
             obs_bins_dic[s] = []
             
+            # Default: Get first 200 allele frequencies for given s 
+            # Later, s will be inferred for these 200 allele frequencies
             freqs_list_raw = GetLRTListFreq200(lrtFile_ground_truth, s) # Get list of allele frequencies for this s
             if first_200 == False:
                 freqs_list_raw = GetLRTListFreq200(lrtFile_ground_truth, s, False)
             if trials_2000 == True:
                 freqs_list_raw = GetLRTListFreq(lrtFile_ground_truth, s)
+                
             # Get summary statistics from frequencies
             for freq_string in freqs_list_raw:
                 
@@ -140,10 +202,12 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
                         #print('Not available: per %d opt allele %d s_ABC_round %.5f'%(per, opt_allele, s_ABC_round))
                         s_ABC_round = getNearestS(s_ABC_round, s_list_available)
                         #print('Nearest s: %.5f'%(s_ABC_round))
+                        
                     list_est_s.append(s_ABC_round) 
                     list_het.append(obs_het)
                     list_common.append(obs_common)
                     list_bins.append(obs_bins)
+                    
                 else:
                     no_ABC_accept = no_ABC_accept + 1
                     
@@ -154,14 +218,13 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
             
             # Put mean of esimated s in s_vals_dic and calculate standard deviation
             s_vals_dic[opt_allele].append(np.mean(list_est_s)) 
-            #std_err = stats.sem(list_est_s, ddof=0)
             std_err = np.std(list_est_s)
             errors_s_dic[opt_allele].append(std_err)
             
         # Get LRT summary statistic tables for s = 0
         lrtFile_for_s_0 = '/gymreklab-tscc/bonnieh/lrt/results/' + lrt_model + '/' + str(per) + '_' + str(opt_allele) + '_15_freqs.txt' 
         freqs_list_raw_0 = GetLRTListByRow(lrtFile_for_s_0, 0)
-        #freqs_list_raw_0 = GetLRTListFreq(lrtFile, 0)
+        
         LRT_table_0_het = []
         LRT_table_0_common = []
         LRT_table_0_bins = []
@@ -220,6 +283,8 @@ def validate_per_locus(per, opt_allele, s_vals, use_het, use_common, use_bins, \
                 LRT_table_s_common = LRT_table_s_common[0:LRT_num_sims]
                 LRT_table_0_bins = LRT_table_0_bins[0:LRT_num_sims]
                 LRT_table_s_bins = LRT_table_s_bins[0:LRT_num_sims]
+                
+                # Get p value
                 if len(LRT_table_s_het) != 0:
                     likelihood_0, likelihood_s_ABC, LR, LogLR, pval = LikelihoodRatioTest(LRT_table_0_het, LRT_table_s_het, \
                                 LRT_table_0_common, LRT_table_s_common, LRT_table_0_bins, LRT_table_s_bins, LRT_num_sims, \
