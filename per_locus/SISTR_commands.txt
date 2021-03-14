@@ -9,7 +9,6 @@ nohup time python /storage/BonnieH/selection_project/per_locus/SISTR.py 0.005 3 
 
 nohup time python /storage/BonnieH/selection_project/per_locus/SISTR.py 0.005 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/0810/allele_freqs_filt_test.txt y n n 5 eurodem_prior1 eurodem_0810 2000 &
 
-
 nohup time python /storage/BonnieH/selection_project/per_locus/SISTR.py 0.005 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/0810/allele_freqs_filt_test.txt y y y 5 eurodem_p2_0825 eurodem_0825 2000 &
 
 nohup time python /storage/BonnieH/selection_project/per_locus/SISTR_fast.py 0.005 3 1 4 0.3 /storage/BonnieH/selection_project/ssc_files/0810/allele_freqs_filt_test.txt y y y 5 eurodem_p2_0825 eurodem_0825 2000 &

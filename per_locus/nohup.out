@@ -1,40 +1,14 @@
-31921.82user 845.06system 11:43:49elapsed 77%CPU (0avgtext+0avgdata 90756maxresident)k
-24864inputs+38792outputs (5major+72232374minor)pagefaults 0swaps
-32074.67user 823.78system 11:45:54elapsed 77%CPU (0avgtext+0avgdata 90720maxresident)k
-23592inputs+38752outputs (0major+74810084minor)pagefaults 0swaps
-32230.69user 885.95system 11:51:03elapsed 77%CPU (0avgtext+0avgdata 89544maxresident)k
-33288inputs+37512outputs (1major+64620207minor)pagefaults 0swaps
-32349.20user 870.38system 11:52:30elapsed 77%CPU (0avgtext+0avgdata 90228maxresident)k
-14552inputs+37352outputs (0major+71557646minor)pagefaults 0swaps
-34171.73user 1040.66system 12:22:23elapsed 79%CPU (0avgtext+0avgdata 91956maxresident)k
-0inputs+39440outputs (0major+88239984minor)pagefaults 0swaps
-33961.21user 1161.68system 12:23:13elapsed 78%CPU (0avgtext+0avgdata 91044maxresident)k
-2568inputs+38264outputs (1major+129727048minor)pagefaults 0swaps
-34231.73user 1058.32system 12:25:01elapsed 78%CPU (0avgtext+0avgdata 92076maxresident)k
-200inputs+39328outputs (1major+114601294minor)pagefaults 0swaps
-34265.21user 1104.39system 12:25:58elapsed 79%CPU (0avgtext+0avgdata 90268maxresident)k
-0inputs+38104outputs (0major+108663041minor)pagefaults 0swaps
-34441.05user 1089.93system 12:29:19elapsed 79%CPU (0avgtext+0avgdata 91560maxresident)k
-0inputs+39912outputs (0major+121949066minor)pagefaults 0swaps
-34323.89user 1241.81system 12:29:36elapsed 79%CPU (0avgtext+0avgdata 90312maxresident)k
-0inputs+38568outputs (0major+135746221minor)pagefaults 0swaps
-Traceback (most recent call last):
-  File "/storage/BonnieH/selection_project/per_locus/SISTR_fast.py", line 301, in <module>
-    main()
-  File "/storage/BonnieH/selection_project/per_locus/SISTR_fast.py", line 49, in main
-    allele_freqs_file = open(inFile, 'r')
-FileNotFoundError: [Errno 2] No such file or directory: '/storage/BonnieH/selection_project/ssc_files/0810/allele_freqs_filt_fast.txt'
-0.66user 0.07system 0:00.76elapsed 96%CPU (0avgtext+0avgdata 68480maxresident)k
-48inputs+8outputs (1major+18059minor)pagefaults 0swaps
-14098.02user 1001.19system 4:41:08elapsed 89%CPU (0avgtext+0avgdata 189200maxresident)k
-1478792inputs+34432outputs (418major+127685715minor)pagefaults 0swaps
-14116.44user 897.88system 4:39:56elapsed 89%CPU (0avgtext+0avgdata 189292maxresident)k
-1345040inputs+34240outputs (166major+76917010minor)pagefaults 0swaps
-14287.60user 1007.11system 4:44:53elapsed 89%CPU (0avgtext+0avgdata 170400maxresident)k
-966464inputs+32760outputs (260major+97248883minor)pagefaults 0swaps
-14323.09user 1023.16system 4:45:08elapsed 89%CPU (0avgtext+0avgdata 188984maxresident)k
-1304320inputs+34720outputs (137major+104298890minor)pagefaults 0swaps
-14400.86user 1002.69system 4:46:28elapsed 89%CPU (0avgtext+0avgdata 170736maxresident)k
-1324392inputs+33224outputs (145major+100441652minor)pagefaults 0swaps
-14354.84user 1056.95system 4:46:38elapsed 89%CPU (0avgtext+0avgdata 170332maxresident)k
-1242888inputs+33048outputs (91major+126008487minor)pagefaults 0swaps
+150.45user 11.30system 3:06.93elapsed 86%CPU (0avgtext+0avgdata 496360maxresident)k
+2594360inputs+384outputs (105major+2195925minor)pagefaults 0swaps
+150.14user 9.75system 3:03.83elapsed 86%CPU (0avgtext+0avgdata 496324maxresident)k
+787592inputs+360outputs (302major+1657670minor)pagefaults 0swaps
+11424.69user 863.44system 4:00:05elapsed 85%CPU (0avgtext+0avgdata 496700maxresident)k
+8870672inputs+33720outputs (333major+130168062minor)pagefaults 0swaps
+  File "SISTR_v2_upd.py", line 247
+    results.write('N/A' + '\t' + s'N/A' + '\t' + \
+                                      ^
+SyntaxError: invalid syntax
+0.02user 0.00system 0:00.05elapsed 62%CPU (0avgtext+0avgdata 7180maxresident)k
+48inputs+8outputs (1major+1900minor)pagefaults 0swaps
+2257.46user 2.66system 37:54.30elapsed 99%CPU (0avgtext+0avgdata 668756maxresident)k
+939632inputs+27648outputs (103major+175644minor)pagefaults 0swaps
