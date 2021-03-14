@@ -1,3 +1,14 @@
 figures/
-old/
-*.pdf
+supp_figures/
+CDF*.ipynb
+*old.ipynb
+Figure3*.ipynb
+Ground*.ipynb
+intron_strand_analysis.ipynb
+Joint-validation*.ipynb
+Mitra_etal*.ipynb
+Per-locus*.ipynb
+Plot_opt*.ipynb
+Plot_posterior.ipynb
+scratch.ipynb
+SupplementalFigure*.ipynb
