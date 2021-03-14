@@ -18,5 +18,6 @@ nohup.out
 SISTR.py
 SISTR_commands.txt
 SISTR_fast*py
+run_SISTR*sh
 *v2*.py
 *_old.py
