@@ -1,0 +1,1 @@
+This directory contains files for 1000 genomes analyses.
