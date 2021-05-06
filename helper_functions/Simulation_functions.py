@@ -6,11 +6,11 @@
 import numpy as np
 from scipy.stats import geom
 import copy
-from ABC_functions import *
 
 ########## Simulation Helper Functions ##########
 
 """Get step size probability
+
 Parameters
 ----------
 a1 : int
@@ -25,7 +25,7 @@ p: float
 Returns
 -------
 step_size_prob: float
-    Given that a1 mutates, the porbability that a1 mutates to a2
+    Given that a1 mutates, the probability that a1 mutates to a2
 """
 def GetStepSizeProb(a1, a2, beta, p):
     step_size = (a2-a1)
@@ -38,6 +38,7 @@ def GetStepSizeProb(a1, a2, beta, p):
     return dir_prob*step_prob
 
 """Build transition matrix 
+
 Parameters
 ----------
 num_alleles : int
@@ -49,12 +50,12 @@ beta: float
 p: float
     Parameterizes the mutation geometric step size distribution
 L: float
-    Length-dependent mutation rate parameter (slope of the increase of mutation rate with allele size)
+    Length-dependent mutation rate parameter (slope of the increase of log10 mutation rate with allele size)
     
 Returns
 -------
 transition_matrix: numpy.ndarray object
-    Matrix of transition probabilities
+    n x n matrix of transition probabilities
 """
 def GetTransitionMatrix(num_alleles, mu, beta, p, L):
     # Initialize matrix (optimal=0)
@@ -75,29 +76,34 @@ def GetTransitionMatrix(num_alleles, mu, beta, p, L):
                 transition_matrix[i,j] = mu_prime*prob
         
     # Rescale each row to sum to 1 
+    '''
     for i in range(num_alleles):
         rowsum = np.sum(transition_matrix[i,:])
         transition_matrix[i,:] = transition_matrix[i,:]/rowsum
-        
+    '''
     return transition_matrix
 
 """Build fitness matrix (fitness of each genotype) 
 
 Parameters
 ----------
-num_alleles : int
+num_alleles: int
     Size of fitness matrix to build. Centered at "0" (most optimal allele in the center)
 s: float
     Selection coefficient. Most fit allele has relative fitness 1. Next most has 1-s, next most has 1-2s, etc.
 is_w_additive: bool
     Whether the fitness of genotypes is calculated under an additive or multiplicative model
-    
+symmetric_model: bool
+    Whether fitness landscape is symmetric or unidirectional
+threshold: int   
+    Threshold below which fitness of allele is 1 
+
 Returns
 -------
 fitness_matrix: numpy.ndarray object
-    Matrix of fitness values
+    n x n matrix of fitness values
 """
-def GetFitnessMatrix(num_alleles, s, is_w_additive):
+def GetFitnessMatrix(num_alleles, s, is_w_additive, symmetric_model=True, threshold=0):
     fitness_matrix = np.zeros((num_alleles, num_alleles))
     for i in range (0, num_alleles):
         for j in range (0, num_alleles):
@@ -105,9 +111,26 @@ def GetFitnessMatrix(num_alleles, s, is_w_additive):
             a2 = -1*int(num_alleles/2)+j
            
             # Get fitness of each allele
-            w_a1 = 1-abs(a1)*s #np.exp(-1*abs(a1)*s) Chance allele won't die, higher w = higher fitness
-            w_a2 = 1-abs(a2)*s #np.exp(-1*abs(a2)*s) Chance allele won't die, higher w = higher fitness
             
+            # Symmetric model 
+            if symmetric_model == True:
+                w_a1 = 1-abs(a1)*s #np.exp(-1*abs(a1)*s) Chance allele won't die, higher w = higher fitness
+                w_a2 = 1-abs(a2)*s #np.exp(-1*abs(a2)*s) Chance allele won't die, higher w = higher fitness
+
+            # Unidirectional model
+            else:
+                # Adjust a1 and a2 based on threshold
+                a1_adj = a1 - threshold
+                a2_adj = a2 - threshold
+                w_a1 = 1-abs(a1_adj)*s #np.exp(-1*abs(a1)*s) Chance allele won't die, higher w = higher fitness
+                w_a2 = 1-abs(a2_adj)*s #np.exp(-1*abs(a2)*s) Chance allele won't die, higher w = higher fitness
+                
+                # If allele is shorter than threshold allele, set fitness to 1
+                if a1 < threshold:
+                    w_a1 = 1
+                if a2 < threshold:
+                    w_a2 = 1
+                
             # Genotype fitness cannot be less than 0
             if is_w_additive == True:
                 fitness_matrix[i,j] = max(0, w_a1/2 + w_a2/2)
@@ -134,17 +157,50 @@ marginal_fitness_vector: numpy.ndarray object
 def GetMarginalFitnessVector(allele_freqs, fitness_matrix):
     return np.matmul(fitness_matrix, allele_freqs)
     
-### Build gradient vector of partial derivatives of mean fitness with respect to each p[i] ###
-# Partial derivative with respect with p[i] is equal to twice the marginal fitness of allele a[i]
+"""Build gradient vector of partial derivatives of mean fitness with respect to each p[i]
+
+Parameters
+----------
+marginal_fitness_vector : numpy.ndarray object
+    1 x n matrix
+
+Returns
+-------
+gradient_vector: numpy.ndarray object
+    1 x n matrix, where the partial derivative with respect with p[i] is equal to twice the marginal fitness of allele a[i]
+"""
 def GetGradient(marginal_fitness_vector):
     return 2*marginal_fitness_vector
     
-### Get mean fitness ###
-# Sum of genotypic fitnesses weighted by corresponding genotype frequency
+"""Get mean fitness
+
+Parameters
+----------
+marginal_fitness_vector : numpy.ndarray object
+    1 x n matrix
+allele_freqs : numpy.ndarray object
+    1 x n matrix
+
+Returns
+-------
+mean_fitnesss: float
+    Sum of genotypic fitnesses weighted by corresponding genotype frequency
+"""
 def GetMeanFitness(marginal_fitness_vector, allele_freqs):
     return np.dot(marginal_fitness_vector, allele_freqs)
 
-### Build covariance matrix ###
+"""Build covariance matrix
+
+Parameters
+----------
+allele_freqs : numpy.ndarray object
+    1 x n matrix
+
+Returns
+-------
+mean_fitnesss: numpy.ndarray object
+    n x n covariance matrix 
+"""
 def GetCovarianceMatrix(allele_freqs):
     
     allele_freqs_matrix = np.reshape(allele_freqs, (1,len(allele_freqs)))
@@ -159,7 +215,7 @@ def GetCovarianceMatrix(allele_freqs):
         
     return covariance_matrix
 
-"""Simulate equilibrium allele frequencies
+"""Simulate allele frequencies forward in time
 
 Parameters
 ----------
@@ -181,23 +237,40 @@ max_iter: int
     Number of generations to perform forward simulations (including the additional generations from incorporating population-specific demographic models)
 end_samp_n: int
     Sample size for observed allele frequencies for last sampling step
+dem_model: string
+    Demographic model to use - either 'european' or 'african'
+symmetric_model: bool
+    Whether fitness landscape is symmetric or unidirectional
+threshold: int   
+    Threshold below which fitness of allele is 1
 return_stats: bool
     Whether to return vectors of heterozygosity and variance over time
 use_drift: bool
     Whether to perform multinomial sampling step at each generation
 set_start_equal: bool
     Whether to set starting vector of allele frequencies as equal
-dem_model: string
-    Demographic model to use - either 'european' or 'african'
+
+Returns
+-------
+allele_freqs_20k : numpy.ndarray object
+    1 x n matrix of allele frequencies after 20k generations
+allele_freqs_50k : numpy.ndarray object
+    1 x n matrix of allele frequencies after 50k generations
+allele_freqs : numpy.ndarray object
+    1 x n matrix of allele frequencies after incorporating population_specific demographic models
+het_list : list
+    List of heterozygosity values over time
+var_list : list
+    List of variance values over time 
 """
-def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_stats=False, use_drift=True, set_start_equal=False, dem_model='european'):
+def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, dem_model='european', symmetric_model=True, threshold=0, use_drift=True, set_start_equal=False, return_stats=False):
 
     PARAM_is_w_additive = True # Whether the fitness matrix of genotypes is additive or multiplicative
 
     # Set the starting vector of allele frequencies 
     allele_freqs = np.zeros(num_alleles)
     
-    # Set starting vector of allele frequencies: All alleles equal frequencies
+    # Set the starting vector of allele frequencies: All alleles equal frequencies
     if set_start_equal == True:
         for i in range(num_alleles):
             allele_freqs[i] = 1/num_alleles
@@ -213,18 +286,19 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
     transition_matrix_transpose = transition_matrix.transpose()
 
     # Calculate fitness matrix for each allele pair (genotype)
-    fitness_matrix = GetFitnessMatrix(num_alleles, s, PARAM_is_w_additive)
+    fitness_matrix = GetFitnessMatrix(num_alleles, s, PARAM_is_w_additive, symmetric_model, threshold)
     
     t = 0 # Number of iterations of while loop
 
     het_list = []
     var_list = []
+    
     allele_freqs_20k = np.zeros(num_alleles) # Allele frequencies from 20k generations
     allele_freqs_50k = np.zeros(num_alleles) # Allele frequencies from 50k generations
     
     while t < max_iter:
         
-        if return_stats == True and t % 100 == 0 and t < max_iter - 5920:
+        if return_stats == True and t % 100 == 0:  
             het = 1-sum([item**2 for item in allele_freqs])
             het_list.append(het)
             var = GetVar(allele_freqs)
@@ -299,8 +373,16 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
         if use_drift == True:
             
             # Use multinomial sampling
+            
+            #try:
+                
             allele_counts = np.random.multinomial(2*N_e, allele_freqs)
-
+                
+            #except ValueError:
+                #print(t)
+                #print(allele_freqs)
+                #break
+            
             # Rescale allele_freqs to sum to 1
             rowsum = np.sum(allele_counts)
 
@@ -322,4 +404,4 @@ def Simulate(num_alleles, N_e, mu, beta, p, L, s, max_iter, end_samp_n, return_s
     if return_stats == False:
         return allele_freqs_20k, allele_freqs_50k, allele_freqs
     else:
-        return allele_freqs_50k, allele_freqs, het_list, var_list
+        return het_list, var_list, allele_freqs
