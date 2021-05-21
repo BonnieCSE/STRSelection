@@ -29,7 +29,7 @@ Optional parameters:
 * __`--header`__ whether input file has a header  
 * __`--column <int>`__ column of input file to use to determine which loci should be included in the joint analysis (default value: 6)    
 * __`--normalized`__ whether to use normalized values when comparing two heterozygosity distributions  
-* __`--normalized-constant`__ normalization constant if using normalized values when comparing 2 heterozygosity distributions (default value: 0.1)   
+* __`--normalized-constant <float>`__ normalization constant if using normalized values when comparing 2 heterozygosity distributions (default value: 0.1)   
 * __`--ks-test`__ whether to use Kolmogorov-Smirnov test to compare two heterozygosity distributions (default option is taking mean of differences of the two distributions)
 * __`--top-x`__ whether to use the top x percent method (default option is using arbitrary thresholds to decide whether two heterozyosity distributions are sufficiently similar)
 * __`--perc-acc <float>`__ what percent of top similar heterozygosity distributions to use (default value: 1)
