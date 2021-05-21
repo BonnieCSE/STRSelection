@@ -60,21 +60,21 @@ Example:
 At this locus, the reference allele length is 26 base pairs or 13 repeat units. In the population, there are 3 alleles present: 100 copies of 12 repeat units, 6000 copies of 13 repeat units, and 400 copies of 15 repeat units.
 
 ## Output file format:
-Num sims: XXX
-Number of loci used: XXX Total number loci: XXX
-Column: XXX "Motif" of column: XXX Optimal allele: XXX
-Observed heterozygosity distribution: [XXX, XXX, ... , XXX]
-Ignore this line
-Ignore this line
-Ignore this line
-Ignore this line
-Ignore this line
-Number a,b pairs accepted: XXX
-Sorted by mean - Median a, b:
-XXX,XXX
-Median mean: XXX
-2.5 percentile mean: XXX
-97.5 percentile mean: XXX
-Accepted params: (XXX, XXX), (XXX, XXX), ... , (XXX, XXX)
-Ignore the rest of the file   
+Num sims: XXX  
+Number of loci used: XXX Total number loci: XXX  
+Column: XXX "Motif" of column: XXX Optimal allele: XXX  
+Observed heterozygosity distribution: [XXX, XXX, ... , XXX]  
+Ignore this line  
+Ignore this line  
+Ignore this line  
+Ignore this line  
+Ignore this line  
+Number a,b pairs accepted: XXX  
+Sorted by mean - Median a, b:  
+XXX,XXX  
+Median mean: XXX  
+2.5 percentile mean: XXX  
+97.5 percentile mean: XXX  
+Accepted params: (XXX, XXX), (XXX, XXX), ... , (XXX, XXX)  
+Ignore the rest of the file  
 See example output file `test_results.txt`.  
