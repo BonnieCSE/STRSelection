@@ -1,9 +1,0 @@
-# Test command
-
-head -n 100 /storage/BonnieH/selection_project/1000genomes/euro_allele_freqs/allele_freqs_filt.txt > /storage/BonnieH/selection_project/1000genomes/euro_allele_freqs/allele_freqs_filt_test.txt
-
-nohup time python /storage/BonnieH/selection_project/per_locus/SISTR_v1.py --abc-lookup-folder /gymreklab-tscc/bonnieh/abc/results/eurodem_prior2_1kg_euro/ --lrt-lookup-folder /gymreklab-tscc/bonnieh/lrt/results/eurodem_0810_1kg_euro/ --in-file /storage/BonnieH/selection_project/1000genomes/euro_allele_freqs/allele_freqs_filt_test.txt --out-file /storage/BonnieH/selection_project/1000genomes/euro_allele_freqs/SISTR_per_locus_scores_test.txt & 
-
-# Run on all loci
-
-nohup time python /storage/BonnieH/selection_project/per_locus/SISTR_v1.py --abc-lookup-folder /gymreklab-tscc/bonnieh/abc/results/eurodem_prior2_1kg_euro/ --lrt-lookup-folder /gymreklab-tscc/bonnieh/lrt/results/eurodem_0810_1kg_euro/ --in-file /storage/BonnieH/selection_project/1000genomes/euro_allele_freqs/allele_freqs_filt.txt --out-file /storage/BonnieH/selection_project/1000genomes/euro_allele_freqs/SISTR_per_locus_scores.txt & 

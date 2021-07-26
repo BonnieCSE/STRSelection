@@ -1,21 +1,21 @@
-# Folder Contents
-This directory contains per-locus SISTR scripts, notebooks, and results
+# Running SISTR with Motif-specific Mutation Rates
 
-## Script to run SISTR: SISTR_v1.py
+## Note: Before running SISTR, lookup tables must first be generated. 
+**When running SISTR with motif-specific mutation rates, we recommend using the available lookup tables found [here](https://drive.google.com/drive/folders/1mjZeKIYVa6FrtDS5LU4Hu-8lzUZJh3C2?usp=sharing) by downloading the entire folder `sistr_resources_motif_specific/` and saving it at the same directory where you are running SISTR.**  
 
-## Notebook descriptions:  
-filter_short_loci.ipynb - Filter out short loci before running SISTR  
-process_SISTR_results.ipynb - Obtain adjusted p values after running SISTR  
+## SISTR Motif-specific Usage
+Example command:
+```
+# Using motif format for input allele frequencies
+python SISTR_motif_specific_mut_rates.py \
+     --in-file allele_freqs_test_motif_format.txt \
+     --out-file test_results_motif_format.txt \
+     --motif-format \
+     --lrt-num-sims 200
+```  
 
-## Subdirectory descriptions:  
-SISTR_results - results used for Mitra et al. 2020  
-SISTR_results_0825 - results showing per-locus results are robust to variable TMRCA  
-SISTR_results_1019 - results including homopolymers  
-SISTR_results_processed - SISTR_results with adjusted p values  
-SISTR_results_processed_0825 - SISTR_results_0825 with adjusted p values  
-SISTR_results_v2 - results using SISTR version 2 with motif specific mutation rates  
+## See Main SISTR per-locus repo for more information about parameters, input file format, and output file format: https://github.com/BonnieCSE/SISTR/tree/master/sistr  
 
-## File descriptions:
-Commands_SISTR_v2.txt - commands to generate results using SISTR v2  
-run_SISTR.sh - commands to generate SISTR_results  
-run_SISTR_0825.sh - commands to generate SISTR_results_0825  
+## 1000 Genomes Per-population Preliminary Analysis  
+
+See `SISTR_results_v2` folder  

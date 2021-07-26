@@ -1,13 +1,64 @@
-# Script to run SISTR version 1: 
+# Script to run SISTR (per-locus method)
 # A method to obtain a posterior estimate of s and corresponding p value for each STR given allele frequency data
+# New updates in this SISTR version: Incorporate more accurate mutation models based on STR motif (i.e. motif-specific mutation rates inferred from SISTR2)
 
 # Imports 
-import sys
 import copy
 import argparse
 from scipy.stats import geom
-sys.path.append("/storage/BonnieH/selection_project/helper_functions")
 from LRT_functions import *
+
+### Helper functions for finding canonical motif ###
+
+# Rotate a string by n characterss
+def rotate(text, n):
+    return text[n:] + text[:n]
+
+# Get reverse, complement, and reverse complement of string
+def ReverseComplement(text):
+    nuc_map = {}
+    nuc_map['A'] = 'T'
+    nuc_map['T'] = 'A'
+    nuc_map['G'] = 'C'
+    nuc_map['C'] = 'G'
+    
+    reverse = ""
+    for nuc in text:
+        reverse = nuc + reverse
+        
+    complement = ""
+    for nuc in text:
+        comp_map = nuc_map[nuc]
+        complement = complement + comp_map
+
+    reverse_complement = "" 
+    for nuc in complement: 
+         reverse_complement = nuc + reverse_complement
+    return reverse, complement, reverse_complement
+
+# Return canonical repeat unit
+# The canonical repeat unit is defined as the lexicographically first repeat unit when considering all rotations and strand orientations of the repeat sequence. 
+# For example, the canonical repeat unit for the repeat sequence CAGCAGCAGCAG would be AGC.
+def GetCanonicalRU(motif, return_all=False):
+    all_versions = [motif]
+    
+    # Get all rotations and strand orientations of the motif
+    length = len(motif)
+    
+    # Rotate length times
+    for i in range(0, 1):
+        rotated_motif = rotate(motif, i)
+        all_versions.append(rotated_motif)
+        reverse, complement, reverse_complement = ReverseComplement(rotated_motif)
+        all_versions.append(reverse)
+        all_versions.append(complement)
+        all_versions.append(reverse_complement)
+    
+    all_versions.sort()
+    if return_all == False:
+        return(all_versions[0])
+    else:
+        return all_versions
 
 ### Main function ###
 def main():
@@ -20,13 +71,11 @@ def main():
     parser.add_argument("--eps-bins", type=float, default=0.3)
     parser.add_argument("--num-bins", type=int, default=5)
     parser.add_argument("--lrt-num-sims", type=int, default=2000)
-    parser.add_argument("--abc-lookup-folder", default = 'sistr_resources/abc_lookup/')
-    parser.add_argument("--lrt-lookup-folder", default = 'sistr_resources/lrt_lookup/')
+    parser.add_argument("--abc-lookup-folder", default = 'sistr_resources_motif_specific/abc_lookup/')
+    parser.add_argument("--lrt-lookup-folder", default = 'sistr_resources_motif_specific/lrt_lookup/')
     parser.add_argument("--in-file")
     parser.add_argument("--out-file")
-    parser.add_argument("--motif-format", default = 'y')
-    parser.add_argument("--header", default = 'n')
-    parser.add_argument("--file-num-extra-sims", type=int, default=15)
+    parser.add_argument("--motif-format", action="store_true")
     
     args = parser.parse_args()
     
@@ -39,35 +88,48 @@ def main():
         
     # Open input and output files
     allele_freqs_file = open(args.in_file, 'r')
-    if args.header == 'y':
-        header = allele_freqs_file.readline().strip().split('\t')
+    header = allele_freqs_file.readline().strip().split('\t')
     results = open(args.out_file, "w")
 
     # Write results header
     results.write("chrom" + "\t" + "start" + "\t" + "end" + "\t" + "total" + "\t" + "period" + \
-                  "\t" + "optimal_ru" + "\t" + "motif" + "\t" + "het" + "\t" + "bins" + "\t" + "ABC_s_median" + "\t" + "ABC_s_95%_CI" + \
-                  "\t" + "Percent_s_accepted" + "\t" + "Likelihood_0" + "\t" + "Likelihood_s" + "\t" + \
-                  "LR" + "\t" + "LogLR" + "\t" + "LRT_p_value" + "\n")
+                  "\t" + "optimal_ru" + "\t" + "motif" + "\t" + \
+                  "ABC_s_median" + "\t" + "ABC_s_95%_CI" + "\t" + "Percent_s_accepted" + "\t" + \
+                  "Likelihood_0" + "\t" + "Likelihood_s" + "\t" + "LR" + "\t" + "LogLR" + \
+                  "\t" + "LRT_p_value" + "\n")
      
     # Preprocess ABC lookup table
     # Get ABC tables
     ABC_tables = {}
     
     opt_allele_dic_w_per = {}
-    
     opt_allele_dic_w_per[2] = [(2,11),(2,12),(2,13),(2,14),(2,15),(2,16),(2,17),(2,18),(2,19),(2,20)]
     opt_allele_dic_w_per[3] = [(3,5),(3,6),(3,7),(3,8),(3,9),(3,10),(3,11),(3,12),(3,13)]
     opt_allele_dic_w_per[4] = [(4,7),(4,8),(4,9),(4,10)]
+    
+    mut_setting_folder_name = {}
+    mut_setting_folder_name[2] = 'eurodem_prior2_dinuc_'
+    mut_setting_folder_name[3] = 'eurodem_prior2_trinuc_'
+    mut_setting_folder_name[4] = 'eurodem_prior2_tetranuc_'
+    
+    mut_settings = {}
+    mut_settings[2] = ['d','e']
+    mut_settings[3] = ['e']
+    mut_settings[4] = ['b','c','d']
     
     pers = [2,3,4]
     for per in pers:
         for per_opt in opt_allele_dic_w_per[per]:
             period = per_opt[0]
             opt_allele = per_opt[1]
-            file = args.abc_lookup_folder + str(period) + '_' + str(opt_allele) + '.txt' 
-            table = GetABCList(file, args.num_bins)
+            folder_prefix = mut_setting_folder_name[period]
+            
+            for mut_setting in mut_settings[period]:
+                
+                file = args.abc_lookup_folder + folder_prefix + mut_setting + '_1kg_euro/' + str(period) + '_' + str(opt_allele) + '.txt' 
+                table = GetABCList(file, args.num_bins)
 
-            ABC_tables[per_opt] = table
+                ABC_tables[(per_opt, mut_setting)] = table
         
     # Perform ABC on each locus
     for line in allele_freqs_file:
@@ -82,11 +144,15 @@ def main():
         per = int(info[5])
         motif = info[6]
 
+        # Change motif to canonical motif
+        canonical_motif = GetCanonicalRU(motif)
+        motif = canonical_motif
+        
         # Get optimal allele and allele_freqs
-        if args.motif_format == 'n':
-            opt_allele, allele_freqs = Process_Freqs(freqs, per, end, start)
-        else:
+        if args.motif_format == True:
             opt_allele, allele_freqs = Process_Freqs(freqs, per, end, start, True, True)
+        else:
+            opt_allele, allele_freqs = Process_Freqs(freqs, per, end, start, True)
         freq_string = ','.join(str(round(item, 5)) for item in allele_freqs)
         
         # Add 0s to allele frequency list if number of alleles less than number of bins
@@ -100,10 +166,9 @@ def main():
         obs_het, obs_common, obs_bins = GetSummStats(freq_string, args.num_bins)
         
         results.write(chrom + '\t' + str(start) + '\t' + str(end) + '\t' + total + '\t' + str(per) + \
-                      '\t' + str(opt_allele) + '\t' + motif + '\t' + str(round(obs_het, 7)) + '\t' + \
-                      ','.join(str(round(item,4)) for item in obs_bins) + '\t')
+                      '\t' + str(opt_allele) + '\t' + motif + '\t')
         
-        # All optimal alleles > 13 have the same mutation rate as optimal allele 13 - their mutation model can be approximated as a locus with optimal allele 13
+        # All optimal alleles > 13 have the same mutation rate as optimal allele 13
         if per == 3 and opt_allele > 13: 
             opt_allele = 13
         if per == 3 and opt_allele < 5:
@@ -119,8 +184,27 @@ def main():
         if per == 2 and opt_allele < 11:
             opt_allele = 11
             
+        # New to SISTR motif-specific mutation rates
+        
+        if per == 2:
+            setting_mut_rate = 'e'
+        if per == 3:
+            setting_mut_rate = 'e'
+        if per == 4:
+            setting_mut_rate = 'd'
+        if motif == 'AC' or motif == 'AG': 
+            setting_mut_rate = 'e'
+        if motif == 'AT': 
+            setting_mut_rate = 'd'
+        if motif == 'AAAG' or motif == 'AAGG' or motif == 'AGAT':
+            setting_mut_rate = 'b'
+        if motif == 'ACAT' or motif == 'AAAT':
+            setting_mut_rate = 'c' 
+        if motif == 'AATC' or motif == 'AATG' or motif == 'ATCC' or motif =='AAAC':
+            setting_mut_rate = 'd'
+
         # Read abcFile line by line and place in lookup table in the form of a list
-        abc_list = ABC_tables[(per, opt_allele)]
+        abc_list = ABC_tables[((per, opt_allele), setting_mut_rate)]
         
         # Perform ABC
         s_ABC, lower_bound, upper_bound, num_accepted, s_accepted = Get_S_ABC(abc_list, 
@@ -161,17 +245,17 @@ def main():
             else:
                 upper_bound = round(upper_bound, 5)
 
-            ABC_conf_int = '(' + str(lower_bound) + ' , ' + str(upper_bound) + ')'
+            ABC_conf_int = '(' + str(lower_bound) + ',' + str(upper_bound) + ')'
 
-            results.write(str(s_ABC) + '\t' + ABC_conf_int + '\t' + str(round(num_accepted/len(ABC_tables[(3,5)])*100,4)) + '\t')
-
+            results.write(str(s_ABC) + '\t' + ABC_conf_int + '\t' + str(round(num_accepted/len(abc_list)*100,4)) + '\t')
+            
             s_ABC_round = get_LRT_bin(s_ABC)
 
             # Perform LRT
 
             ### Get list of s values in LRT simulations file ###
             s_list_available = []
-            lrtFile = args.lrt_lookup_folder + str(per) + '_' + str(opt_allele) + '_freqs.txt' 
+            lrtFile = args.lrt_lookup_folder + 'eurodem_per_' + str(per) + '_' + setting_mut_rate + '_1kg_euro/' + str(per) + '_' + str(opt_allele) + '_freqs.txt' 
             
             lrt_file = open(lrtFile, 'r')
             header = lrt_file.readline().strip()
@@ -187,7 +271,7 @@ def main():
                 s_ABC_round = getNearestS(s_ABC_round, s_list_available)
 
             # Get LRT summary statistic tables for s = 0
-            lrtFile_for_s_0 = args.lrt_lookup_folder + str(per) + '_' + str(opt_allele) + '_%d_freqs.txt'%(args.file_num_extra_sims) 
+            lrtFile_for_s_0 = args.lrt_lookup_folder + 'eurodem_per_' + str(per) + '_' + setting_mut_rate + '_1kg_euro/' + str(per) + '_' + str(opt_allele) + '_15_freqs.txt'
             freqs_list_raw_0 = GetLRTListByRow(lrtFile_for_s_0, 0)
             LRT_table_0_het = []
             LRT_table_0_common = []
@@ -228,7 +312,7 @@ def main():
 
             results.write(str(round(likelihood_0, 7)) + '\t' + str(round(likelihood_s_ABC, 7)) + '\t' + \
                               str(round(LR, 7)) + '\t' + str(round(LogLR ,7)) + '\t' + str(round(pval, 7)) + '\n')
-
+            
     allele_freqs_file.close()
             
     results.close()
