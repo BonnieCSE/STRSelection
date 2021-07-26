@@ -5,6 +5,7 @@
 
 import math
 import numpy as np
+import copy
 
 ########## ABC Helper Functions ##########
 
@@ -29,6 +30,18 @@ def GetBins(allele_freqs, num_bins):
         bins_index = bins_index + 1
                            
     return bins
+    '''
+    # Computing strt, and end index 
+    extract = num_bins - 2
+    strt_idx = (len(allele_freqs) // 2) - (extract // 2)
+    end_idx = (len(allele_freqs) // 2) + (extract // 2)
+
+    # Slicing extracting middle elements
+    bins = allele_freqs[strt_idx: end_idx + 1]
+    bins.append(sum(allele_freqs[-1*(len(allele_freqs) - end_idx - 1):]))
+    bins.insert(0,sum(allele_freqs[:strt_idx]))
+    return bins
+    '''
 
 ### Get summary statistics ###
 # Return heterozygosity, number of common alleles, bins of allele frequencies (if num_bins > 0)
@@ -69,8 +82,7 @@ def Process_Freqs(freqs, per, end, start, return_freqs=True, motif=False):
 
     # Create dictionary of freqs: key is allele and value is freq
     freqs_dic = {}
-    
-    
+   
     for pair in freqs_list:
         if motif == False:
             allele = int(pair.split(':')[0])
@@ -124,59 +136,6 @@ def Process_Freqs(freqs, per, end, start, return_freqs=True, motif=False):
 
         return opt_allele, allele_freqs
 
-### Process freqs ###
-# Return optimal allele repeat units, allele frequencies
-def Process_Freqs_Given_Opt(freqs, per, end, start, opt_allele, return_freqs=True):
-    # Process freqs
-    freqs_list = freqs.split(',')
-
-    # Create dictionary of freqs: key is allele and value is freq
-    freqs_dic = {}
-    
-    for pair in freqs_list:
-        allele = int(pair.split(':')[0])
-        freq = int(pair.split(':')[1])
-        freqs_dic[int(allele/per)] = freq
-        
-    # Note: Actual population size is actually half the value of the variable pop_size 
-    # because pop_size is calculated by adding up diploid allele freqs
-    pop_size = 0
-    for elem in freqs_dic:
-        pop_size = pop_size + freqs_dic[elem]
-   
-    # Get optimal allele (how many ru away from reference allele) - allele with highest frequency
-    #opt_allele_rel = max(freqs_dic, key=freqs_dic.get)
-
-    # Get info about reference allele (length in base pairs, repeat units)
-    ref_length_bp = end - start + 1
-    ref_length_ru = int(ref_length_bp/per)
-
-    # Get optimal allele repeat unit length 
-    #opt_allele = ref_length_ru + opt_allele_rel
-    opt_allele_rel = opt_allele - ref_length_ru
-    if return_freqs == False:
-        return opt_allele
-    
-    else:
-        # Get allele frequencies
-        freqs_dic_final = {}
-        allele_list = []
-        for allele in freqs_dic:
-            new_allele = allele - opt_allele_rel
-            freqs_dic_final[new_allele] = freqs_dic[allele]
-            allele_list.append(new_allele)
-
-        # Get highest absolute value in list
-        max_allele = abs(max(allele_list, key=abs))
-
-        # Put allele freqs in list
-        allele_freqs = [0] * (2*max_allele+1) 
-        for key in freqs_dic_final:
-            allele_freq = freqs_dic_final[key]/pop_size
-            allele_freqs[max_allele+key] = allele_freq
-
-        return opt_allele, allele_freqs
-    
 ### Get epsilon (error tolerance) for heterozygosity ###
 def GetEpsilonHet(obs_het, constant_het, denom_het):
     epsilon = (obs_het + constant_het)/denom_het
@@ -189,10 +148,14 @@ def GetEpsilonCommon(obs_common, constant_common, denom_common):
 
 ### Get distance between 2 vectors ###
 def GetVectorDistance(vector1, vector2):
+    
     distance = 0
     for i in range(0, len(vector1)):
         distance = distance + abs(vector1[i] - vector2[i])
     return distance
+    
+    #return np.linalg.norm(np.array(vector1) - np.array(vector2), ord=1)
+    #return np.linalg.norm(vector1 - vector2, ord=1)
 
 ### Get list of s with corresponding summary statistics ###
 def GetABCList(abcFile, num_bins):
@@ -246,6 +209,8 @@ def Get_S_ABC(abc_list, obs_het, obs_common, obs_bins, constant_het,
     EPSILON_common = GetEpsilonCommon(obs_common, constant_common, denom_common)
     EPSILON_bins = eps_bins
   
+    # List of summary statistics to use 
+    # (indicated by 0, 1, and 2 for heterozygosity, number of common alleles, allele frequency bins respectively)
     stats_to_check = []
     
     if use_het == 'y':
@@ -296,23 +261,6 @@ def Get_S_ABC(abc_list, obs_het, obs_common, obs_bins, constant_het,
         median_s = np.median(s_accepted)
         lower_bound = np.percentile(s_accepted, 2.5) 
         upper_bound = np.percentile(s_accepted, 97.5) 
-        
-        # Comment out rounding
-        '''
-        if median_s < 10**-5:
-            median_s = 0
-        else:
-            median_s = round(median_s, 5)
-        
-        if lower_bound < 10**-5:
-            lower_bound = 0
-        else:
-            lower_bound = round(lower_bound, 5)
-        if upper_bound < 10**-5:
-            upper_bound = 0
-        else:
-            upper_bound = round(upper_bound, 5)
-        '''
         return median_s, lower_bound, upper_bound, num_accepted, s_accepted
     
     else:
