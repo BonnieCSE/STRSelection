@@ -1,0 +1,27 @@
+Differential Selection Scores for the 1000 Genomes Populations
+-Scores obtained using SISTR (Selection Inference at Short Tandem Repeats)
+--A method to estimate selection coefficients at each STR in the genome
+
+Explanation of column headers:
+Note: In the files, 'x' is replaced by the population name abbreviation (e.g. CEU, CHB, YRI)
+
+chrom: chromosome number
+start: starting position of locus
+end: ending position of locus
+period: number of base pairs in the repeat motif (e.g. period 2 refers to dinucleotides)
+motif: repeat motif
+x_optimal_ru: number of repeat units in optimal allele (most frequent allele length in population)
+x_s_val: median of posterior distribution of s obtained from ABC
+x_95%_CI: 95% confidence interval of posterior distribution of s obtained from ABC
+x_p_val: p value obtained using a likelihood ratio test
+diff_score_med: difference between the s values (median of the posterior distribution) of the two populations 
+diff_score_ci: difference between the 95% CIs of the two populations 
+    -calculated as the difference between lower bound of the CI with larger values and the upper bound of the CI with smaller values
+    -set to 0 if CIs overlap
+ci_overlap: whether 95% CIs overlap, 'Y' for yes and 'N' for no
+diff_opt: whether the optimal alleles are the same for the two populations, 'Y' for yes and 'N' for no
+    -two optimal alleles are considered the same if they have the same mutation rate
+    -e.g. period 2 optimal allele 21 and 22 are considered the same since they both have a mutation rate of 10^-3
+diff_selection: whether the locus is under differential selection, 'Y' for yes and 'N' for no
+    -differential selection is defined as one locus having a p value < 0.001 and the other having a p value > 0.2
+    
