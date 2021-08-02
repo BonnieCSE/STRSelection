@@ -1,4 +1,4 @@
-# This script extracts a sample's genotype information from the merged VCF that contains information regarding all samples
+# This script extracts a sample's genotype information from the merged VCF "EUR_sans_FIN_filtered_keep_w_scores.vcf.gz" that contains information regarding all samples
 # Example command to run script: python Generate_sample_info_txt.py --sample NA10865
 
 import vcf
