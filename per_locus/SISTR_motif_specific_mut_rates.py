@@ -1,4 +1,4 @@
-# Script to run SISTR (per-locus method)
+# Script to run SISTR version 2 (per-locus method)
 # A method to obtain a posterior estimate of s and corresponding p value for each STR given allele frequency data
 # New updates in this SISTR version: Incorporate more accurate mutation models based on STR motif (i.e. motif-specific mutation rates inferred from SISTR2)
 
@@ -27,6 +27,12 @@ def ReverseComplement(text):
         reverse = nuc + reverse
         
     complement = ""
+    
+    # Return motif as is if it contains an 'N'
+    for elem in text:
+        if elem != 'A' and elem != 'T' and elem != 'G' and elem != 'C':
+            return text, text, text
+    
     for nuc in text:
         comp_map = nuc_map[nuc]
         complement = complement + comp_map
@@ -46,12 +52,12 @@ def GetCanonicalRU(motif, return_all=False):
     length = len(motif)
     
     # Rotate length times
-    for i in range(0, 1):
+    for i in range(0, length):
         rotated_motif = rotate(motif, i)
         all_versions.append(rotated_motif)
         reverse, complement, reverse_complement = ReverseComplement(rotated_motif)
-        all_versions.append(reverse)
-        all_versions.append(complement)
+        #all_versions.append(reverse)
+        #all_versions.append(complement)
         all_versions.append(reverse_complement)
     
     all_versions.sort()
@@ -108,9 +114,9 @@ def main():
     opt_allele_dic_w_per[4] = [(4,7),(4,8),(4,9),(4,10)]
     
     mut_setting_folder_name = {}
-    mut_setting_folder_name[2] = 'eurodem_prior2_dinuc_'
-    mut_setting_folder_name[3] = 'eurodem_prior2_trinuc_'
-    mut_setting_folder_name[4] = 'eurodem_prior2_tetranuc_'
+    mut_setting_folder_name[2] = 'eurodem_dinuc_'
+    mut_setting_folder_name[3] = 'eurodem_trinuc_'
+    mut_setting_folder_name[4] = 'eurodem_tetranuc_'
     
     mut_settings = {}
     mut_settings[2] = ['d','e']
@@ -126,7 +132,7 @@ def main():
             
             for mut_setting in mut_settings[period]:
                 
-                file = args.abc_lookup_folder + folder_prefix + mut_setting + '_1kg_euro/' + str(period) + '_' + str(opt_allele) + '.txt' 
+                file = args.abc_lookup_folder + folder_prefix + mut_setting + '_1kg/' + str(period) + '_' + str(opt_allele) + '.txt' 
                 table = GetABCList(file, args.num_bins)
 
                 ABC_tables[(per_opt, mut_setting)] = table
@@ -150,7 +156,7 @@ def main():
         
         # Get optimal allele and allele_freqs
         if args.motif_format == True:
-            opt_allele, allele_freqs = Process_Freqs(freqs, per, end, start, True, True)
+            opt_allele, allele_freqs = Process_Freqs(freqs, per, end, start, True, True)    
         else:
             opt_allele, allele_freqs = Process_Freqs(freqs, per, end, start, True)
         freq_string = ','.join(str(round(item, 5)) for item in allele_freqs)
@@ -255,7 +261,7 @@ def main():
 
             ### Get list of s values in LRT simulations file ###
             s_list_available = []
-            lrtFile = args.lrt_lookup_folder + 'eurodem_per_' + str(per) + '_' + setting_mut_rate + '_1kg_euro/' + str(per) + '_' + str(opt_allele) + '_freqs.txt' 
+            lrtFile = args.lrt_lookup_folder + 'eurodem_per_' + str(per) + '_' + setting_mut_rate + '_1kg/' + str(per) + '_' + str(opt_allele) + '_freqs.txt' 
             
             lrt_file = open(lrtFile, 'r')
             header = lrt_file.readline().strip()
@@ -271,7 +277,7 @@ def main():
                 s_ABC_round = getNearestS(s_ABC_round, s_list_available)
 
             # Get LRT summary statistic tables for s = 0
-            lrtFile_for_s_0 = args.lrt_lookup_folder + 'eurodem_per_' + str(per) + '_' + setting_mut_rate + '_1kg_euro/' + str(per) + '_' + str(opt_allele) + '_15_freqs.txt'
+            lrtFile_for_s_0 = args.lrt_lookup_folder + 'eurodem_per_' + str(per) + '_' + setting_mut_rate + '_1kg/' + str(per) + '_' + str(opt_allele) + '_15_freqs.txt'
             freqs_list_raw_0 = GetLRTListByRow(lrtFile_for_s_0, 0)
             LRT_table_0_het = []
             LRT_table_0_common = []
