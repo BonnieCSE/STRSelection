@@ -1,7 +1,7 @@
 # Running SISTR with Motif-specific Mutation Rates
 
 ## Note: Before running SISTR, lookup tables must first be generated. 
-**When running SISTR with motif-specific mutation rates, we recommend using the available lookup tables found [here](https://drive.google.com/drive/folders/1mjZeKIYVa6FrtDS5LU4Hu-8lzUZJh3C2?usp=sharing) by downloading the entire folder `sistr_resources_motif_specific/` and saving it at the same directory where you are running SISTR.**  
+**When running SISTR with motif-specific mutation rates, we recommend using the available lookup tables found [here](https://drive.google.com/drive/folders/1Dsv6ySVfV3vydFDOBEZ0Ei5Gw28iHgbE?usp=sharing) by downloading the entire folder `sistr_resources_motif_specific/` and saving it at the same directory where you are running SISTR.**  
 
 ## SISTR Motif-specific Usage
 Example command:
