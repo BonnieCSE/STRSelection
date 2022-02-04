@@ -15,7 +15,7 @@ cd joint_method
 ```
 
 ## Note: Before running SISTR Joint, lookup tables must first be generated. 
-**We recommend using the available lookup tables found [here](https://drive.google.com/drive/folders/1PsyJ9a47xwPY2mjdB6qGgFydqQ9fJaqG?usp=sharing) by downloading the entire folder `sistr_joint_resources/` and saving it at the same directory where you are running SISTR Joint.**  
+**We recommend using the available lookup tables found [here](https://drive.google.com/drive/folders/1fjEWxmvQ38p397-9NUCWYAUoqpto7N_n?usp=sharing) by downloading the entire folder `sistr_joint_resources/` and saving it at the same directory where you are running SISTR Joint.**  
 
 ## SISTR Joint Usage  
 Example command:
